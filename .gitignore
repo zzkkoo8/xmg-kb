@@ -1,0 +1,95 @@
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+
+# Runtime data
+var/
+runtime-data/
+state/
+work/
+parsed/
+normalized/
+knowledge/
+exports/
+logs/
+backups/
+cache/
+models/
+indexes/
+vector-index/
+
+# Databases
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.duckdb
+*.rdb
+*.dump
+*.sql.gz
+
+# Knowledge/source documents and archives
+*.pdf
+*.doc
+*.docx
+*.ppt
+*.pptx
+*.xls
+*.xlsx
+*.odt
+*.ods
+*.odp
+*.epub
+*.eml
+*.msg
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+*.tar.xz
+
+# Generated media - public docs should prefer reviewed SVG/Mermaid
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.tiff
+*.bmp
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Node
+node_modules/
+
+# IDE / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Test/runtime artifacts
+coverage.xml
+.coverage
+htmlcov/
+.junit/
+.tmp/
+tmp/
