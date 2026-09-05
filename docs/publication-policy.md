@@ -1,99 +1,125 @@
-# Public Repository Publication Policy
+# 公共仓库发布规范
 
-This repository is public. It is intended for architecture, source code, tests, deployment templates and public documentation only.
+本仓库是公开仓库。
 
-## Allowed
+原则：
 
-- architecture and design documents written with generic examples;
-- source code;
-- unit/integration tests using synthetic fixtures;
-- Docker/Compose/Helm/Make/Task configuration templates;
-- `.env.example` files containing placeholders only;
-- public component version/license manifests;
-- generic operational runbooks;
-- generated diagrams that contain no private topology or data;
-- benchmark methodology and synthetic benchmark data.
+> 只公开软件、架构、模板和合成测试数据；不公开任何真实知识内容或运行数据。
 
-## Forbidden
+## 1. 允许提交
 
-Never commit or upload:
+- 公开架构设计；
+- 源代码；
+- Schema；
+- Prompt 模板；
+- Unit/Integration Tests；
+- Synthetic Fixtures；
+- Docker/Compose/Helm/Make 等模板；
+- `.env.example`；
+- 公共版本/许可证清单；
+- 通用运维文档；
+- Mermaid / 审核后的 SVG；
+- Benchmark 方法和合成 Benchmark 数据。
 
-- source knowledge-base documents;
-- vendor/customer/internal manuals collected for private use;
-- parsed or normalized corpora;
-- production wiki exports;
-- production RAG chunks or vector indexes;
-- database dumps;
-- runtime state databases;
-- logs or trace exports from real users;
-- internal audit reports containing private data;
-- credentials, tokens, cookies, API keys, private certificates or `.env` files;
-- internal hostnames, private IP addresses or internal service URLs;
-- private filesystem paths from a real deployment;
-- customer/vendor-specific confidential data;
-- screenshots from internal systems;
-- backups, archives or binary document bundles.
+## 2. 禁止提交
 
-## Repository examples must use neutral placeholders
+绝对禁止：
 
-Use:
+- 真实知识库 Source Documents；
+- 私有厂商/客户/内部手册；
+- Parsed/Normalized 真实语料；
+- Production Wiki Export；
+- RAG Chunk / Vector Index；
+- Database Dump；
+- Runtime State DB；
+- 真实 Logs / Trace；
+- 内部审计报告；
+- Password / Token / Cookie / API Key；
+- Private Key；
+- `.env`；
+- 私有主机名、内部 URL；
+- 真实部署绝对路径；
+- 客户/内部系统信息；
+- 内部截图；
+- Backup / Archive。
+
+## 3. 示例规范
+
+公共文档只使用：
 
 ```text
 /srv/xmg-kb
 /srv/xmg-kb/evidence
 https://wiki.example.invalid
 https://rag.example.invalid
-10.0.0.0/24 only when explicitly marked as documentation-reserved example data
 ```
 
-Do not copy real deployment paths, hostnames, addresses or user data from a working system.
+不得把真实运行环境路径复制进仓库。
 
-## Data separation
-
-Public code must assume runtime data lives outside the Git repository:
+## 4. 数据分离
 
 ```text
-Repository checkout
-  -> code/config/templates only
+Git Checkout
+  → code / docs / templates
 
-External runtime root
-  -> evidence
-  -> parsed/normalized data
-  -> databases
-  -> indexes
-  -> logs
-  -> backups
+External Runtime Root
+  → evidence
+  → parsed
+  → normalized
+  → databases
+  → indexes
+  → logs
+  → backups
 ```
 
-No program should require private knowledge files to exist inside the repository checkout.
+软件不得要求私有知识文件必须位于 Git checkout 内。
 
-## Mandatory pre-push checks
+## 5. Pre-push Gate
 
-Before any public push:
+至少：
 
-1. run tests;
-2. run `git diff --check`;
-3. run a secret scanner such as Gitleaks;
-4. scan for forbidden runtime paths/hostnames;
-5. inspect all new binary files;
-6. inspect `git status --short` manually;
-7. confirm no generated knowledge artifacts are staged.
+1. Tests；
+2. `git diff --check`；
+3. Secret Scan（如 Gitleaks）；
+4. Forbidden Path/Hostname Scan；
+5. Binary Review；
+6. `git status --short`；
+7. Generated Knowledge Artifact Check。
 
-The repository should provide `scripts/check-public.sh` to automate these checks.
+任一失败：
 
-## Default-deny binary policy
+```text
+PUBLICATION_GATE: BLOCKED
+```
 
-Technical source documents are not release artifacts. The default `.gitignore` should reject common private document/archive/database formats. Public documentation diagrams should use reviewed text-based formats such as SVG or Mermaid whenever possible.
+## 6. Binary Default Deny
 
-## Release rule
+默认忽略常见：
 
-A release artifact may contain:
+- PDF；
+- Office；
+- Archive；
+- Database；
+- Image；
+- Runtime Artifacts。
 
-- application code;
-- public deployment manifests;
-- migration/schema code;
-- synthetic fixtures;
-- templates;
-- public docs.
+公共示意图优先使用 Mermaid 或人工审核后的文本型 SVG。
 
-A release artifact must never contain runtime evidence or production knowledge.
+## 7. Release
+
+Release 可以包含：
+
+- Code；
+- Public Deploy Manifest；
+- Schema/Migration Code；
+- Synthetic Fixture；
+- Templates；
+- Public Docs。
+
+Release 不得包含：
+
+- Runtime Evidence；
+- Production Knowledge；
+- Production DB；
+- Index；
+- Trace。
