@@ -9,8 +9,9 @@
 *.crt
 *.cer
 
-# Runtime data
+# Runtime / private operational data
 var/
+runtime/
 runtime-data/
 state/
 work/
@@ -18,6 +19,7 @@ parsed/
 normalized/
 knowledge/
 exports/
+reports/
 logs/
 backups/
 cache/
