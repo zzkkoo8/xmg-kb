@@ -1,247 +1,296 @@
-# Execution Roadmap
+# 研发路线图
 
-This roadmap is intentionally phase-gated. A later phase must not be enabled until its prerequisite evidence is verified.
+所有阶段均采用 Gate 模式。
+
+后续 Phase 只有在前置 Phase 有真实验收证据后才能启用。
 
 ## Phase 0 — Preflight
 
-Goal: verify host capacity, storage, container runtime, network access and component compatibility.
+目标：
 
-Acceptance:
+- 主机资源；
+- 存储；
+- Container Runtime；
+- 网络；
+- 端口；
+- 组件兼容性。
 
-- host resource report exists;
-- storage headroom is measured;
-- ports and persistent paths are allocated;
-- deployment mode is selected (`all-on` or staged runtime);
-- no knowledge data has been modified.
+验收：
 
-## Phase 1 — Bootstrap all components
+- Resource Report；
+- Storage Headroom；
+- Port Plan；
+- Runtime Mode；
+- 无 Knowledge Data 被修改。
 
-Install, pin and smoke-test the selected components without ingesting production knowledge.
+## Phase 1 — Bootstrap Components
 
-Acceptance for each component:
+部署、锁定版本、Smoke Test：
 
-- exact version and image digest recorded;
-- service starts;
-- API/UI health check succeeds;
-- restart preserves state where applicable;
-- default credentials are removed or disabled;
-- no production dataset has been loaded.
+- BookStack；
+- Prefect；
+- Docling Serve；
+- MinerU；
+- RAGFlow；
+- Langfuse；
+- KAG/OpenSPG POC。
 
-## Phase 2 — Source registry and manifest
+此阶段不得导入正式知识。
 
-Build an immutable inventory of source materials and previously curated knowledge.
+验收：
 
-Acceptance:
+- Exact Version / Digest；
+- Service Starts；
+- API/UI Health；
+- Restart Persistence；
+- 默认凭据已处理；
+- Production Dataset 为空。
 
-- every eligible source has a stable source ID;
-- hashes and metadata are stored;
-- source provenance is queryable;
-- inventory can be rerun incrementally;
-- no source file is modified.
+## Phase 2 — Source Registry / Manifest
 
-## Phase 3 — Reuse mapping
+建立稳定 Source ID、Hash、Metadata、Provenance。
 
-Prefer previously curated material over reparsing equivalent raw source files.
+验收：
 
-Final states include:
+- Eligible Sources 100% 登记；
+- Incremental Rerun；
+- Source File 不被修改。
 
-- accepted reuse;
-- needs repair;
-- confirmed duplicate;
-- archive-only;
-- unsupported;
-- quarantined;
-- unmapped.
+## Phase 3 — Reuse Mapping
 
-Acceptance:
+已整理内容优先复用。
 
-- mapping rules are deterministic and documented;
-- accepted reusable documents are not sent back through expensive parsing;
-- unresolved mappings are visible.
+状态至少：
 
-## Phase 4 — Parser pilot
+- Accepted Reuse；
+- Needs Repair；
+- Confirmed Duplicate；
+- Archive Only；
+- Unsupported；
+- Quarantined；
+- Unmapped。
 
-Run a representative corpus through Docling Serve with MinerU fallback.
+验收：
 
-Acceptance:
+- 映射规则可解释；
+- Accepted 不重复 Parser；
+- Unresolved 可查询。
 
-- asynchronous submit/status/result flow works;
-- retries and resumability work;
-- failures are isolated per document;
-- structured output and provenance are persisted;
-- critical facts in high-value samples are preserved;
-- parser routing thresholds are calibrated from evidence.
+## Phase 4 — Parser Pilot
 
-## Phase 5 — Bulk ingestion runtime
-
-Scale the parser workflow with bounded batches and explicit concurrency limits.
-
-Acceptance:
-
-- at least 1,000 representative files can be queued safely;
-- worker restart does not lose task state;
-- completed documents are not duplicated;
-- storage growth and processing throughput are measured;
-- failure rates remain within the pilot threshold.
-
-## Phase 6 — Document governance
-
-Apply exact deduplication, near-document relations, taxonomy, version scope, authority and security classification.
-
-Acceptance:
-
-- exact duplicate precision is 100%;
-- near-duplicate precision is at least 95% on the reviewed sample;
-- critical version merges have zero known errors;
-- required metadata coverage is at least 99%;
-- unknown metadata is explicitly marked rather than invented.
-
-## Phase 7 — Human wiki pilot
-
-Validate BookStack as the human knowledge workspace before large-scale canonicalization.
-
-Acceptance:
-
-- WYSIWYG and Markdown editing are acceptable;
-- pages, chapters/books, attachments, history, comments, permissions and search work;
-- REST API can safely read and write review content;
-- backup/restore is tested;
-- human owner explicitly approves daily use.
-
-## Phase 8 — Knowledge-engineering pilot
-
-Compare a simple curator baseline against KAG/OpenSPG on the same real corpus.
-
-Acceptance targets:
-
-- source traceability: 100%;
-- knowledge-unit factual precision: at least 98%;
-- critical wrong merges: 0;
-- reviewed alignment precision: at least 95%;
-- at least 30 canonical drafts are produced and human-reviewed.
-
-KAG is adopted only if it provides meaningful quality improvement at acceptable operational cost.
-
-## Phase 9 — Canonical knowledge workflow
-
-Create review pages and promote approved knowledge to canonical wiki locations.
-
-Acceptance:
-
-- every canonical page has traceable sources;
-- version scope is explicit;
-- unsupported claims are absent;
-- obvious duplicate canonical pages are absent;
-- review-to-canonical permissions are enforced.
-
-## Phase 10 — RAG production ingestion
-
-Synchronize canonical wiki pages into RAGFlow.
-
-Production ingestion:
+代表性语料：
 
 ```text
-Canonical page
-  -> Parser
-  -> Chunker
-  -> optional Transformer
-  -> Indexer
+Docling Serve
+→ Parse Quality Gate
+→ MinerU fallback
 ```
 
-Acceptance:
+验收：
 
-- production contains canonical content only;
-- review/raw/archive content cannot be retrieved;
-- every chunk inherits stable page/revision metadata;
-- incremental update is idempotent;
-- a failed new revision leaves the old active revision available.
+- Async Submit/Status/Result；
+- Retry / Resume；
+- 单文档失败隔离；
+- Provenance；
+- Critical Fact 保留；
+- Threshold 由 Pilot 校准。
 
-## Phase 11 — Retrieval benchmark
+## Phase 5 — Bulk Ingestion Runtime
 
-Build a gold QA set and compare retrieval configurations.
+建立有界批处理和并发限制。
 
-At minimum compare:
+验收：
 
-- vector only;
-- full-text only;
-- hybrid;
-- hybrid + reranking;
-- multiple chunk-size/structure strategies.
+- 至少 1,000 个代表性文件 Queue 测试；
+- Worker Restart 不丢状态；
+- Completed 不重复；
+- Storage / Throughput 可量化；
+- Fail 可单文档 Retry。
 
-Initial targets:
+## Phase 6 — Document Governance
 
-- Top-5 recall >= 95%;
-- critical Top-5 recall >= 98%;
-- citation correctness >= 95%;
-- correct refusal >= 98%;
-- critical hallucination = 0.
+执行：
 
-## Phase 12 — AI knowledge-management interface
+- Exact Dedup；
+- Near-document Dedup；
+- Metadata；
+- Taxonomy / Alias；
+- Version；
+- Authority；
+- Security Classification。
 
-Expose safe wiki operations to AI through BookStack REST API and a thin MCP adapter.
+初始验收：
 
-Allowed by default:
+- Exact Precision = 100%；
+- Near Duplicate Precision >= 95%；
+- Critical Wrong Version Merge = 0；
+- Required Metadata Coverage >= 99%。
 
-- search;
-- read;
-- create review draft;
-- patch review draft;
-- comment;
-- source lookup.
+## Phase 7 — Human Wiki Pilot
 
-Disallowed by default:
+验证 BookStack 是否满足长期人类维护。
 
-- delete canonical page;
-- bypass review;
-- overwrite version/conflict decisions silently.
+验收：
 
-## Phase 13 — Observability and evaluation
+- WYSIWYG；
+- Markdown；
+- Hierarchy；
+- Search；
+- Tags；
+- Attachments；
+- Comments；
+- History；
+- Permissions；
+- REST API；
+- Backup / Restore；
+- Human Owner 明确批准。
 
-Connect QA traces to Langfuse.
+## Phase 8 — Knowledge Engineering POC
 
-Acceptance:
+同一语料比较：
 
-- query, retrieved canonical IDs, answer, citations, latency and feedback are recorded;
-- evaluation datasets can be created;
-- failed or weak retrieval cases are queryable.
+```text
+Simple Curator
+vs
+KAG/OpenSPG
+```
 
-## Phase 14 — Knowledge evolution
+初始目标：
 
-Classify usage signals into:
+- Source Traceability = 100%；
+- KU Factual Precision >= 98%；
+- Critical Wrong Merge = 0；
+- Alignment Precision >= 95%；
+- >= 30 Canonical Drafts。
 
-- `GOOD`
-- `WEAK`
-- `MISSING`
-- `CONFLICT`
-- `OUTDATED`
-- `FRAGMENTED`
+KAG 必须通过真实收益证明才 ADOPT。
 
-High-priority events produce review proposals, never direct canonical writes.
+## Phase 9 — Canonical Workflow
 
-## Phase 15 — Scale validation
+所有 AI / Pipeline 内容先进入 Review。
 
-Run the complete flow on multiple domains with different data quality.
+批准后进入 Canonical。
 
-Acceptance:
+验收：
 
-- the same codebase is reused;
-- differences are primarily taxonomy, aliases, policy configuration and prompts;
-- domain expansion does not require a parallel pipeline implementation.
+- Source Traceable；
+- Version Explicit；
+- Unsupported Claim = 0；
+- Duplicate Canonical = 0；
+- Review Permission 生效。
 
-## Phase 16 — Full migration
+## Phase 10 — RAG Production Ingestion
 
-Migrate source materials by domain/product in bounded waves.
+```text
+Canonical
+→ Parser
+→ Chunker
+→ optional Transformer
+→ Indexer
+```
 
-Acceptance:
+验收：
 
-- every source has a final state;
-- unresolved sources are zero before retirement of any legacy store;
-- canonical source traceability is 100%;
-- production RAG remains canonical-only;
-- migration and restore reports pass.
+- Production 只有 Canonical；
+- Review/Raw 无法检索；
+- Chunk 继承 Page/Revision Metadata；
+- Incremental Idempotent；
+- 新 Revision 失败时旧 Revision 仍可用。
 
-## Phase 17 — Operations and distribution
+## Phase 11 — Retrieval Benchmark
 
-Finalize reproducible packaging, health checks, backup/restore, upgrade procedure and release artifacts.
+至少比较：
 
-A release is ready only when a clean host can deploy from public code/config templates without any private source material.
+- Full-text；
+- Vector；
+- Hybrid；
+- Hybrid + Rerank；
+- 多个 Chunk Size；
+- 多个结构切分策略。
+
+初始目标：
+
+- Top-5 Recall >= 95%；
+- Critical Top-5 Recall >= 98%；
+- Citation Correctness >= 95%；
+- Correct Refusal >= 98%；
+- Critical Hallucination = 0。
+
+## Phase 12 — AI Knowledge Management
+
+通过 BookStack REST API + 薄 MCP Adapter 暴露：
+
+- Search；
+- Read；
+- Create Review；
+- Patch Review；
+- Comment；
+- Source Lookup。
+
+默认禁止：
+
+- Delete Canonical；
+- Bypass Review；
+- Silent Conflict Resolution。
+
+## Phase 13 — Observability / Eval
+
+Langfuse 接入：
+
+- Query；
+- Retrieved Canonical IDs；
+- Chunks；
+- Answer；
+- Citation；
+- Latency；
+- Feedback；
+- Scores。
+
+## Phase 14 — Knowledge Evolution
+
+识别：
+
+- GOOD；
+- WEAK；
+- MISSING；
+- CONFLICT；
+- OUTDATED；
+- FRAGMENTED。
+
+只生成 Proposal，不直接写 Canonical。
+
+## Phase 15 — Scale Validation
+
+选择多个不同质量领域。
+
+验收：
+
+- 复用同一代码；
+- 差异主要落在 Taxonomy / Alias / Policy / Prompt；
+- 不产生平行第二套 Pipeline。
+
+## Phase 16 — Full Migration
+
+按 Product/Domain 有界迁移。
+
+验收：
+
+- Every Source Has Final State；
+- Unresolved = 0；
+- Canonical Traceability = 100%；
+- RAG Canonical-only；
+- Backup / Restore PASS。
+
+## Phase 17 — Packaging / Distribution
+
+完成：
+
+- Upstream Image Pinning；
+- Component Deploy Templates；
+- Project CLI/Make；
+- Health Check；
+- Backup/Restore；
+- Upgrade；
+- Public Release Safety Gate。
+
+Release 必须能在一个全新环境中，只依靠公开代码和模板完成部署，不依赖任何私有语料。
