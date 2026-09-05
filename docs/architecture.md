@@ -1,162 +1,244 @@
-# Architecture
+# 总体架构
 
-## 1. System objective
+## 1. 架构目标
 
-xmg-kb is a self-hosted knowledge engineering platform that converts heterogeneous technical documents into two products:
+xmg-kb 将异构 Evidence 转化为两个稳定产物：
 
-1. a human-maintainable canonical wiki;
-2. a high-quality RAG index for AI assistants.
+1. 人类长期维护的 Canonical Wiki；
+2. 面向 AI QA 的高质量 RAG Index。
 
-The system deliberately separates **evidence**, **canonical knowledge**, and **retrieval chunks**.
+系统明确分离：
 
-## 2. Reference architecture
+```text
+Evidence
+Canonical Knowledge
+RAG Chunks
+```
+
+三者不能混为一层。
+
+## 2. 总体流程
 
 ```text
 Evidence Sources
-  |-- Markdown / HTML
-  |-- PDF / images
-  |-- DOCX / PPTX / XLSX
-  |-- historical curated knowledge
-  |
-  v
-Source Registry + Manifest
-  |
-  v
+  ├─ Markdown / HTML
+  ├─ PDF / Image
+  ├─ DOCX / PPTX / XLSX
+  └─ Historical Curated Knowledge
+          ↓
+Source Registry / Manifest
+          ↓
 Prefect
-  |-- retry / cache / resume / scheduling / concurrency
-  |
-  v
+  ├─ Retry
+  ├─ Cache
+  ├─ Resume
+  ├─ Schedule
+  └─ Concurrency
+          ↓
 Document Parsing
-  |-- Docling Serve (primary)
-  `-- MinerU (complex-document fallback)
-  |
-  v
+  ├─ Docling Serve
+  └─ MinerU fallback
+          ↓
 Normalized Evidence
-  |-- structured JSON
-  |-- Markdown
-  |-- assets
-  `-- provenance metadata
-  |
-  v
+  ├─ Structured JSON
+  ├─ Markdown
+  ├─ Assets
+  └─ Provenance
+          ↓
 Document Governance
-  |-- exact deduplication
-  |-- near-document deduplication
-  |-- metadata and taxonomy
-  |-- version scope
-  |-- authority
-  `-- security classification
-  |
-  v
+  ├─ Exact Dedup
+  ├─ Near-document Dedup
+  ├─ Metadata / Taxonomy / Alias
+  ├─ Version
+  ├─ Authority
+  └─ Security Classification
+          ↓
 Knowledge Governance
-  |-- sections
-  |-- knowledge units
-  |-- duplicate/supplement/supersede relations
-  |-- conflicts
-  `-- canonicalization policy
-  |
-  v
-BookStack Review Area
-  |
-  v
+  ├─ Section
+  ├─ Knowledge Unit
+  ├─ Relations
+  ├─ Conflict
+  └─ Canonicalization
+          ↓
+BookStack Review
+          ↓
+Human Approval
+          ↓
 BookStack Canonical Wiki
-  |
-  +------------------------------+
-  |                              |
-  | Full-document API            | Canonical-only sync
-  v                              v
+        ├─────────────────────────┐
+        ↓                         ↓
+BookStack REST API          Canonical-only Sync
+        ↓                         ↓
 Knowledge-management AI       RAGFlow
-                              |-- Parser
-                              |-- Chunker
-                              |-- optional Transformer
-                              `-- Indexer
-                                   |
-                                   v
-                         Hybrid Retrieval + Reranker
-                                   |
-                                   v
+                              ├─ Parser
+                              ├─ Chunker
+                              ├─ Transformer（可选）
+                              └─ Indexer
+                                   ↓
+                    Metadata Filter / Hybrid / Rerank
+                                   ↓
                                   QA AI
-                                   |
-                                   v
-                                Langfuse
-                                   |
-                                   v
-                      Knowledge Evolution Candidates
-                                   |
-                                   `----> Review Area
+                                   ↓
+                               Langfuse
+                                   ↓
+                  Knowledge Evolution Candidates
+                                   ↓
+                              Review Queue
 ```
 
-## 3. Component selection
+## 3. Human Wiki：BookStack
 
-### BookStack — canonical human wiki
+BookStack 作为默认 Canonical Wiki。
 
-BookStack is the default human knowledge layer because it is MIT licensed, self-hosted, actively maintained, lightweight, and provides both WYSIWYG and Markdown editing together with page history, attachments, permissions, webhooks and a built-in REST API.
+选择理由：
 
-The wiki is the **authoritative human knowledge store**. AI must not edit its database directly. All automated operations use the supported REST API.
+- MIT；
+- 自托管；
+- WYSIWYG；
+- Markdown；
+- Books / Chapters / Pages；
+- Search；
+- Tags；
+- Attachments；
+- Page History；
+- Permissions；
+- Webhooks；
+- 内置 REST API；
+- Export / Import；
+- 运维和备份文档成熟。
 
-A thin xmg-kb MCP gateway may expose safe AI operations such as search, read, create-review, patch-review and comment. Destructive canonical operations should be disabled by default.
+AI 不直接操作 BookStack 数据库。
 
-### Prefect — orchestration
-
-Prefect owns durable workflow state: scheduling, retries, caching, concurrency, resumability and event-driven execution. xmg-kb does not implement another workflow engine.
-
-### Docling Serve — primary parser
-
-Docling Serve provides an asynchronous API for document conversion. Parsed output should preserve structured representation and Markdown where possible.
-
-### MinerU — fallback parser
-
-MinerU is used only for inputs where Docling quality fails acceptance checks, particularly complex layouts, scanned PDFs, OCR-heavy documents, formulas or difficult tables.
-
-### RAGFlow — retrieval layer
-
-RAGFlow indexes **canonical wiki content only** for production QA. Raw and review content may be placed in separate staging datasets for administrator research but must never leak into production retrieval.
-
-Production ingestion is:
+自动化统一使用：
 
 ```text
-Canonical Wiki
-  -> Parser
-  -> Chunker
-  -> optional Transformer
-  -> Indexer
-  -> metadata filtering
-  -> hybrid retrieval
-  -> reranking
+BookStack REST API
 ```
 
-### Langfuse — trace and evaluation
+标准 Agent 接口通过一个薄的 `xmgkb-mcp` 适配层暴露。
 
-Langfuse records query/retrieval/answer traces, user feedback and evaluation results. These signals feed the knowledge-evolution queue but never directly overwrite canonical knowledge.
+默认工具：
 
-### OpenSPG/KAG — optional POC
+```text
+wiki_search
+wiki_read
+wiki_sources
+wiki_create_review
+wiki_patch_review
+wiki_comment
+rag_search
+```
 
-KAG/OpenSPG is evaluated against a simpler curator baseline on real data. It is adopted only if it materially improves knowledge-unit quality, alignment, conflict discovery or canonical synthesis without unacceptable operational cost.
+破坏性 Canonical 操作默认不开放。
 
-## 4. Knowledge layers
+## 4. Workflow：Prefect
 
-### Raw evidence
+Prefect 负责：
 
-Immutable source materials. Raw evidence is never the production RAG source.
+- Flow / Task；
+- Retry；
+- Cache；
+- Schedule；
+- Result Persistence；
+- Concurrency；
+- Durable State；
+- Worker。
 
-### Normalized evidence
+xmg-kb 不实现第二套 Workflow Runtime。
 
-Machine-generated structured representations. This layer is rebuildable and is not edited by humans as authoritative knowledge.
+## 5. Parser：Docling Serve + MinerU
 
-### Knowledge units
+Docling Serve 是主 Parser，使用异步任务接口：
 
-Semantic governance units used for consolidation, versioning and conflict detection. A knowledge unit is not a RAG chunk.
+```text
+submit
+→ task_id
+→ poll
+→ result
+```
 
-### Canonical articles
+MinerU 只处理 Docling 未通过 Parse Quality Gate 的复杂文档。
 
-Human-readable, reviewable, editable pages in BookStack. These are the authoritative knowledge artifacts.
+Parser 输出保留：
 
-### RAG chunks
+- 结构化数据；
+- Markdown；
+- Assets；
+- Parser Version；
+- Source Hash；
+- Provenance。
 
-Retrieval units generated from canonical articles. They are derived data and can always be rebuilt.
+## 6. Document Governance
 
-## 5. Canonicalization actions
+### Level 1：Exact File
 
-The canonicalization policy may emit only:
+```text
+SHA256
+```
+
+### Level 2：Near Document
+
+候选信号：
+
+- Filename；
+- Title；
+- Heading Tree；
+- MinHash；
+- Normalized Text；
+- Embedding；
+- Version。
+
+### Level 3：Knowledge-level
+
+在 Knowledge Unit 上判断：
+
+- `equivalent`
+- `supplements`
+- `supersedes`
+- `version_specific`
+- `conflicts`
+- `example_of`
+- `unrelated`
+
+## 7. Knowledge Unit
+
+Knowledge Unit 是治理单位，不是 RAG Chunk。
+
+```text
+Knowledge Unit
+= 去重 / 版本 / 冲突 / Canonical
+
+RAG Chunk
+= Retrieval
+```
+
+## 8. Knowledge Engineering
+
+默认实现一个薄的 Simple Curator：
+
+```text
+Section
+→ Schema-constrained KU Extraction
+→ Candidate Search
+→ Relation Judgment
+→ Cluster
+→ Canonical Proposal
+```
+
+OpenSPG/KAG 在同一数据集上 POC。
+
+只有显著提升：
+
+- KU Accuracy；
+- Alignment；
+- Conflict Discovery；
+- Canonical Quality；
+
+且运维成本可接受时才 ADOPT。
+
+## 9. Canonicalization
+
+动作固定为：
 
 - `CREATE`
 - `PATCH`
@@ -165,29 +247,145 @@ The canonicalization policy may emit only:
 - `CONFLICT_REVIEW`
 - `NO_ACTION`
 
-It must never perform an unreviewed automatic delete of canonical knowledge.
+禁止 `AUTO_DELETE`。
 
-## 6. Indexing strategy
+已有主题优先：
 
-Production retrieval uses:
+```text
+PATCH > CREATE
+```
 
-- canonical-only input;
-- heading-aware chunking;
-- code/table/procedure boundary protection;
-- inherited metadata on every chunk;
-- hybrid full-text + vector retrieval;
-- reranking;
-- incremental sync by stable source ID, revision and content hash;
-- atomic activation of new revisions;
-- traceability from every retrieved chunk back to its wiki page and revision.
+目标是知识收敛，而不是页面无限增长。
 
-Chunk size and retrieval settings are selected by benchmark, not by fixed assumptions.
+## 10. Production RAG：RAGFlow
 
-## 7. Packaging strategy
+Production 只索引：
 
-The project should be easy to develop, install and distribute without creating one fragile monolithic Compose file.
+```text
+BookStack Canonical
+```
 
-Recommended repository layout:
+禁止：
+
+- Raw → Production；
+- Review → Production；
+- Normalized → Production；
+- 历史临时语料 → Production。
+
+正式流程：
+
+```text
+Canonical Page
+→ Parser
+→ Chunker
+→ optional Transformer
+→ Indexer
+→ Metadata Filter
+→ Hybrid Retrieval
+→ Rerank
+```
+
+RAGFlow 官方当前 Ingestion Pipeline 本身提供 Parser、Transformer、Chunker、Indexer，因此 xmg-kb 不自研 Chunk Engine。
+
+## 11. Chunking
+
+技术文档优先测试：
+
+```text
+Heading-aware
++
+Token Control
+```
+
+保护：
+
+- Code Block；
+- Table；
+- Procedure；
+- Version Section。
+
+Chunk Size 不能写死，应由 Gold QA Benchmark 决定。
+
+## 12. Chunk Metadata
+
+每个 Production Chunk 至少继承：
+
+```text
+wiki_page_id
+wiki_revision
+canonical_id
+heading_path
+vendor
+product
+component
+version
+category
+authority
+content_sha256
+```
+
+任何无法回溯 Canonical Page 的 Chunk 都是无效数据。
+
+## 13. Incremental Sync
+
+Wiki Revision：
+
+```text
+N → N+1
+```
+
+同步：
+
+```text
+detect hash/revision
+→ ingest N+1
+→ index ready
+→ validate
+→ activate N+1
+→ retire N
+```
+
+失败则保留 N。
+
+## 14. Langfuse
+
+Langfuse 负责：
+
+- Trace；
+- Retrieval Context；
+- Answer；
+- Feedback；
+- Dataset；
+- Evaluation；
+- Experiment。
+
+它只产生 Evolution Signal，不直接修改 Canonical。
+
+## 15. Knowledge Evolution
+
+状态：
+
+- `GOOD`
+- `WEAK`
+- `MISSING`
+- `CONFLICT`
+- `OUTDATED`
+- `FRAGMENTED`
+
+高优先级事件：
+
+```text
+Evidence Search
+→ CREATE / PATCH / CONFLICT_REVIEW
+→ BookStack Review
+→ Human Approval
+```
+
+## 16. Packaging
+
+仓库提供薄封装，不 fork 上游产品。
+
+建议：
 
 ```text
 deploy/
@@ -206,64 +404,37 @@ src/xmg_kb/
   schemas/
   mcp/
 
-config/
-  examples/
-
+config/examples/
 scripts/
-  bootstrap
-  verify
-  backup
-
 tests/
 ```
 
-Use upstream-supported deployment artifacts whenever practical. xmg-kb should provide thin wrappers such as:
+生命周期命令建议统一为：
 
 ```text
-make bootstrap
-make up-core
-make up-ingestion
-make up-rag
-make up-observability
-make verify
-make test
-make backup
+bootstrap
+up-core
+up-ingestion
+up-rag
+up-observability
+status
+verify
+test
+backup
+restore
 ```
 
-The wrappers orchestrate pinned upstream components; they do not reimplement those components.
+## 17. 非目标
 
-## 8. Data-flow activation
+不自研：
 
-All components may be installed and smoke-tested early, but production data flows are enabled only after their prerequisites pass.
-
-```text
-Bootstrap components
-  -> source inventory
-  -> reuse mapping
-  -> parser pilot
-  -> document governance
-  -> knowledge engineering pilot
-  -> canonical wiki pilot
-  -> RAG benchmark
-  -> QA integration
-  -> observability
-  -> knowledge evolution
-  -> full-scale migration
-```
-
-## 9. Non-goals
-
-xmg-kb does not build its own:
-
-- wiki editor;
-- OCR engine;
-- PDF layout engine;
-- workflow runtime;
-- vector database;
-- search engine;
-- tracing platform;
-- evaluation dashboard;
-- generic graph database;
-- MCP protocol implementation.
-
-Only domain-specific glue, policy and adapters are custom code.
+- Wiki Editor；
+- OCR；
+- PDF Layout Engine；
+- Workflow Runtime；
+- Vector Database；
+- Search Engine；
+- Trace Platform；
+- Evaluation Dashboard；
+- 通用 Graph DB；
+- 通用 MCP 协议框架。
