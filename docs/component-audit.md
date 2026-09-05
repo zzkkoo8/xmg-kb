@@ -1,99 +1,216 @@
-# Component Audit
+# 组件选型审计
 
-This document records the current architecture decision criteria for xmg-kb.
+## 1. 选型标准
 
-## Decision criteria
+按以下顺序评估：
 
-Components are evaluated in this order:
+1. 可自托管；
+2. 成熟、持续维护；
+3. 开源许可证优先；
+4. API 稳定；
+5. 生产运维可落地；
+6. 易开发、打包、升级；
+7. 数据可迁移、可追溯；
+8. 尽量减少自研。
 
-1. self-hostable;
-2. mature and actively maintained;
-3. open-source licensing preferred;
-4. stable documented API;
-5. practical production operations;
-6. easy packaging and upgrade path;
-7. ability to preserve provenance and data portability;
-8. minimal custom code.
+## 2. Human Wiki
 
-## Human wiki
+### 默认：BookStack
 
-### Selected: BookStack
+结论：采用。
 
-Rationale:
+原因：
 
-- MIT licensed;
-- self-hosted and lightweight;
-- active 2026 release cycle;
-- WYSIWYG and Markdown editors;
-- books/chapters/pages hierarchy;
-- attachments, page history, permissions, comments, tags and templates;
-- built-in REST API for external read/write automation;
-- webhooks and documented backup/maintenance model.
+- MIT；
+- 自托管；
+- 长期活跃；
+- WYSIWYG + Markdown；
+- Books / Chapters / Pages；
+- Search / Tags；
+- Attachments；
+- Page History；
+- Permissions；
+- Webhooks；
+- 内置 REST API；
+- Export / Import；
+- 运维和安全文档成熟。
 
-AI read/write is implemented through the supported REST API. A thin MCP adapter can provide a standard agent interface without coupling agents to the wiki database.
+BookStack API 文档随实例提供在 `/api/docs`，自动化使用受权限约束的 API Token。
 
-### Not selected as default: Outline
+AI 通过 REST API 读写 Review；标准 Agent 入口通过薄 `xmgkb-mcp` Adapter 暴露。
 
-Outline provides excellent UX and first-party API/MCP integration, but its current Business Source License 1.1 explicitly states that it is not an open-source license. It can remain an optional deployment profile where source-available licensing is acceptable.
+### Outline
 
-### Not selected as default: Docmost
+不作为默认开源基线。
 
-Docmost Core is AGPL-3.0 and has a modern collaborative UI, but its official REST API currently requires the Enterprise edition. Depending on private/internal API routes would weaken upgrade stability for the AI-edit requirement.
+原因：
 
-### Alternative: Wiki.js
+- UX 和第一方 API/MCP 很强；
+- 但当前 BSL 1.1 明确不是 Open Source License。
 
-Wiki.js remains a valid AGPL-3.0 alternative with a GraphQL API and Markdown focus. BookStack is preferred for the current baseline because of its simple deployment, MIT license, mature REST API and active operational documentation.
+如果部署环境接受 Source-Available，可作为 Alternative Profile。
 
-## Orchestration
+### Docmost
 
-### Selected: Prefect
+不作为当前默认。
 
-Prefect provides Python-native flows, task retries, caching, scheduling, event triggers, concurrency control and a self-hosted server. These are infrastructure concerns that should not be reimplemented in xmg-kb.
+原因：
 
-## Document parsing
+- Core 为 AGPL；
+- UI 现代；
+- 但需要再次验证其当前稳定版公开 API 能力与许可边界后，才适合承担“AI 稳定读写”主链。
 
-### Selected primary: Docling Serve
+## 3. Workflow
 
-Docling is MIT licensed and production-oriented. Docling Serve exposes asynchronous conversion endpoints with task IDs and status polling, making it suitable for durable batch orchestration.
+### Prefect
 
-### Selected fallback: MinerU
+结论：采用。
 
-MinerU handles complex PDFs, OCR, formulas and tables well and supports several mainstream office/document formats. Its current license is based on Apache-2.0 with additional terms, so deployments should review those terms before redistribution or commercial service exposure.
+官方项目使用 Apache-2.0，提供 Python-native：
 
-## Production RAG
+- Flow / Task；
+- Retry；
+- Cache；
+- Schedule；
+- Concurrency；
+- Server / Worker。
 
-### Selected: RAGFlow
+不在 xmg-kb 中自研 Workflow Runtime。
 
-RAGFlow owns production parsing/chunking/indexing/retrieval for canonical wiki content. xmg-kb does not implement a second vector database or chunk engine.
+## 4. Document Parsing
 
-The production index should contain canonical wiki content only. Raw evidence and review content may use separate administrator-only staging datasets.
+### Docling Serve
 
-## Observability and evaluation
+结论：主 Parser。
 
-### Selected: Langfuse
+Docling Core/Docling 为 MIT。Docling Serve 暴露异步任务接口：
 
-Langfuse core capabilities are MIT licensed and self-hostable. It provides tracing, feedback, datasets, experiments and evaluation, avoiding the need for a custom AI observability platform.
+```text
+POST async
+→ task_id
+→ poll
+→ result
+```
 
-## Knowledge engineering
+并支持 `local`、`rq`、`ray` 等执行引擎，可从单机 Pilot 扩展到 Worker 架构。
 
-### Optional POC: OpenSPG/KAG
+### MinerU
 
-OpenSPG is Apache-2.0. KAG is tested only as a knowledge-engineering accelerator. The baseline pipeline must remain functional without it.
+结论：Fallback。
 
-Adoption requires a controlled benchmark showing meaningful improvement in knowledge-unit extraction, alignment, conflict detection or canonical synthesis.
+适用于：
 
-## Packaging decision
+- 扫描件；
+- 复杂布局；
+- 表格；
+- 公式；
+- OCR；
+- Docling 低质量结果。
 
-xmg-kb should distribute a **thin orchestration layer**, not forks of upstream products.
+当前 MinerU 使用“基于 Apache 2.0 并带附加条款”的 MinerU Open Source License，分发和对外服务前必须重新审计许可证条件。
 
-Preferred delivery model:
+## 5. Production RAG
 
-- pinned upstream container images;
-- component-specific Compose/deployment files;
-- a project-level Makefile or CLI for lifecycle commands;
-- Python glue packaged with `uv`/standard Python packaging;
-- synthetic fixtures only;
-- environment templates with placeholders;
-- automated public-repository safety checks.
+### RAGFlow
 
-Avoid one huge custom Compose file that rewrites every upstream deployment unless a later release benchmark proves that consolidation is worth the maintenance cost.
+结论：采用。
+
+RAGFlow 当前官方 Ingestion Pipeline 提供：
+
+- Parser；
+- Transformer；
+- Chunker；
+- Indexer。
+
+Indexer 支持：
+
+- Full-text；
+- Embedding；
+- Hybrid（官方推荐）。
+
+因此 xmg-kb 不自研 Chunk Engine、Vector DB 或 Hybrid Search Engine。
+
+Production Dataset 只允许 Canonical Wiki。
+
+## 6. Observability / Evaluation
+
+### Langfuse
+
+结论：采用。
+
+Langfuse 可自托管，核心开源能力包括：
+
+- Tracing；
+- Feedback；
+- Dataset；
+- Experiment；
+- Evaluation。
+
+只将其作为 Trace/Eval 和 Evolution Signal 来源，不作为知识事实源。
+
+## 7. Knowledge Engineering
+
+### Simple Curator
+
+结论：必须有。
+
+作用：
+
+- Section → KU；
+- Candidate Retrieval；
+- Relation Judgment；
+- Conflict；
+- Canonical Proposal。
+
+保持薄、可替换。
+
+### OpenSPG/KAG
+
+结论：POC。
+
+KAG 当前 Apache-2.0，定位为专业领域知识构建与推理框架。
+
+必须通过同一真实数据集对照实验后才能 ADOPT。
+
+## 8. AI 标准接口
+
+### xmgkb-mcp
+
+结论：薄层自研。
+
+只封装：
+
+- BookStack REST API；
+- RAG Search；
+- Provenance Lookup。
+
+不要实现通用 MCP Runtime，使用成熟 MCP SDK。
+
+默认只暴露安全工具。
+
+## 9. Packaging
+
+xmg-kb 分发：
+
+- Pinned upstream images；
+- Component-specific deployment files；
+- `uv` Python package；
+- Project CLI / Make；
+- Synthetic fixtures；
+- `.env.example`；
+- CI；
+- Public Safety Gate。
+
+禁止 fork 上游组件形成私有发行版，除非有单独 ADR 证明必要。
+
+## 10. 官方参考
+
+- BookStack: https://www.bookstackapp.com/docs/
+- BookStack Source: https://codeberg.org/bookstack/bookstack
+- Prefect: https://github.com/PrefectHQ/prefect
+- Docling: https://github.com/docling-project/docling
+- Docling Serve: https://github.com/docling-project/docling-serve
+- MinerU: https://github.com/opendatalab/MinerU
+- RAGFlow: https://github.com/infiniflow/ragflow
+- Langfuse: https://langfuse.com/docs
+- KAG/OpenSPG: https://github.com/OpenSPG/KAG
