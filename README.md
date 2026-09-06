@@ -23,9 +23,9 @@ Normalize / Dedup / Version / Provenance
       ↓
 Knowledge Governance
       ↓
-BookStack Review
+Outline 90-Review
       ↓
-BookStack Canonical Wiki
+Outline Canonical Collections
       ↓
 RAGFlow Parser → Chunker → Indexer
       ↓
@@ -55,14 +55,14 @@ KAG/OpenSPG 作为 Knowledge Engineering 加速器进行 POC，对比简单 Cura
 
 | 能力 | 组件 | 角色 |
 |---|---|---|
-| Human Wiki | BookStack | Canonical Wiki / Review |
+| Human Wiki | Outline | Canonical Wiki / Review |
 | Workflow | Prefect | Retry / Resume / Cache / Schedule |
 | 主解析 | Docling Serve | 异步文档解析 |
 | 复杂文档兜底 | MinerU | OCR / 复杂布局 / 表格 / 公式 |
 | RAG | RAGFlow | Parser / Chunker / Indexer / Retrieval |
 | Trace & Eval | Langfuse | Trace / Feedback / Dataset / Evaluation |
 | Knowledge Engineering | Simple Curator + KAG POC | KU / Alignment / Conflict / Canonical |
-| AI Wiki 接口 | BookStack REST API + xmgkb-mcp | 安全 AI 读写 |
+| AI Wiki 接口 | Outline API/MCP + Webhook Adapter | 安全 AI 读写与状态同步 |
 | 本地状态 | SQLite / PostgreSQL（按规模） | Pipeline state |
 
 ## Codex 开局

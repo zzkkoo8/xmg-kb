@@ -1,0 +1,315 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xmg-kb.local/schemas/components-lock.schema.json",
+  "title": "Phase 1 immutable component lock",
+  "type": "object",
+  "required": ["components"],
+  "additionalProperties": false,
+  "properties": {
+    "components": {
+      "$ref": "#/$defs/lockedComponents"
+    }
+  },
+  "$defs": {
+    "lockedComponents": {
+      "type": "object",
+      "required": ["outline", "prefect", "docling-serve", "mineru", "ragflow", "langfuse", "libreoffice", "clamav"],
+      "additionalProperties": false,
+      "properties": {
+        "outline": {"$ref": "#/$defs/outlineComponent"},
+        "prefect": {"$ref": "#/$defs/prefectComponent"},
+        "docling-serve": {"$ref": "#/$defs/doclingComponent"},
+        "mineru": {"$ref": "#/$defs/mineruComponent"},
+        "ragflow": {"$ref": "#/$defs/ragflowComponent"},
+        "langfuse": {"$ref": "#/$defs/langfuseComponent"},
+        "libreoffice": {"$ref": "#/$defs/libreofficeComponent"},
+        "clamav": {"$ref": "#/$defs/clamavComponent"},
+        "kag-poc": {"$ref": "#/$defs/kagComponent"}
+      }
+    },
+    "outlineComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/requiredComponent"},
+        {"$ref": "#/$defs/composeComponent"},
+        {"if": {"properties": {"resolution_status": {"const": "RESOLVED"}}}, "then": {"properties": {"deployment": {"properties": {"path": {"const": "runtime/outline/compose.upstream.yaml"}}}}}}
+      ]
+    },
+    "prefectComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/requiredComponent"},
+        {"$ref": "#/$defs/composeComponent"},
+        {"if": {"properties": {"resolution_status": {"const": "RESOLVED"}}}, "then": {"properties": {"deployment": {"properties": {"path": {"const": "runtime/prefect/compose.upstream.yaml"}}}}}}
+      ]
+    },
+    "doclingComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/requiredComponent"},
+        {"$ref": "#/$defs/composeComponent"},
+        {"if": {"properties": {"resolution_status": {"const": "RESOLVED"}}}, "then": {"properties": {"deployment": {"properties": {"path": {"const": "runtime/docling-serve/compose.upstream.yaml"}}}}}}
+      ]
+    },
+    "mineruComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/requiredComponent"},
+        {"if": {"properties": {"resolution_status": {"const": "RESOLVED"}}}, "then": {"properties": {"deployment_mode": {"const": "container-cli"}, "deployment": {"properties": {"path": {"const": "runtime/mineru/deployment.md"}}}}}}
+      ]
+    },
+    "ragflowComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/requiredComponent"},
+        {"$ref": "#/$defs/composeComponent"},
+        {"if": {"properties": {"resolution_status": {"const": "RESOLVED"}}}, "then": {"properties": {"deployment": {"properties": {"path": {"const": "runtime/ragflow/compose.upstream.yaml"}}}}}}
+      ]
+    },
+    "langfuseComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/requiredComponent"},
+        {"$ref": "#/$defs/composeComponent"},
+        {"if": {"properties": {"resolution_status": {"const": "RESOLVED"}}}, "then": {"properties": {"deployment": {"properties": {"path": {"const": "runtime/langfuse/compose.upstream.yaml"}}}}}}
+      ]
+    },
+    "libreofficeComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/requiredComponent"},
+        {"if": {"properties": {"resolution_status": {"const": "RESOLVED"}}}, "then": {"properties": {"deployment_mode": {"const": "native-package"}, "deployment": {"properties": {"path": {"const": "runtime/libreoffice/deployment.md"}}}}}}
+      ]
+    },
+    "clamavComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/requiredComponent"},
+        {"$ref": "#/$defs/composeComponent"},
+        {"if": {"properties": {"resolution_status": {"const": "RESOLVED"}}}, "then": {"properties": {"deployment": {"properties": {"path": {"const": "runtime/clamav/compose.upstream.yaml"}}}}}}
+      ]
+    },
+    "kagComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/optionalComponent"},
+        {"$ref": "#/$defs/composeComponent"},
+        {"if": {"properties": {"resolution_status": {"const": "RESOLVED"}}}, "then": {"properties": {"deployment": {"properties": {"path": {"const": "runtime/kag-poc/compose.upstream.yaml"}}}}}}
+      ]
+    },
+    "composeComponent": {
+      "if": {"properties": {"resolution_status": {"const": "RESOLVED"}}},
+      "then": {"properties": {"deployment_mode": {"const": "compose"}}}
+    },
+    "requiredComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/component"},
+        {"properties": {"gate_role": {"const": "required"}}}
+      ]
+    },
+    "optionalComponent": {
+      "allOf": [
+        {"$ref": "#/$defs/component"},
+        {"properties": {"gate_role": {"const": "optional"}}}
+      ]
+    },
+    "component": {
+      "oneOf": [
+        {"$ref": "#/$defs/resolvedComponent"},
+        {"$ref": "#/$defs/blockedComponent"}
+      ]
+    },
+    "resolvedComponent": {
+      "type": "object",
+      "required": ["gate_role", "resolution_status", "version", "source_url", "docs_url", "license", "upgrade_notes_url", "artifacts", "closure", "deployment", "deployment_mode", "resources", "runtime_identity", "persistent_paths", "configuration"],
+      "additionalProperties": false,
+      "properties": {
+        "gate_role": {"enum": ["required", "optional"]},
+        "resolution_status": {"const": "RESOLVED"},
+        "version": {"$ref": "#/$defs/immutableRef"},
+        "source_url": {"$ref": "#/$defs/officialUrl"},
+        "docs_url": {"$ref": "#/$defs/officialUrl"},
+        "license": {"$ref": "#/$defs/license"},
+        "upgrade_notes_url": {"$ref": "#/$defs/officialUrl"},
+        "artifacts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/artifact"}},
+        "closure": {"$ref": "#/$defs/closure"},
+        "deployment": {"$ref": "#/$defs/deployment"},
+        "deployment_mode": {"enum": ["compose", "container-cli", "native-package"]},
+        "resources": {"$ref": "#/$defs/resources"},
+        "runtime_identity": {"$ref": "#/$defs/runtimeIdentity"},
+        "persistent_paths": {"type": "array", "items": {"$ref": "#/$defs/persistentPath"}},
+        "configuration": {"$ref": "#/$defs/configuration"}
+      }
+    },
+    "blockedComponent": {
+      "type": "object",
+      "required": ["gate_role", "resolution_status", "blocker", "evidence", "checked_at"],
+      "additionalProperties": false,
+      "properties": {
+        "gate_role": {"enum": ["required", "optional"]},
+        "resolution_status": {"const": "BLOCKED"},
+        "blocker": {"type": "string", "minLength": 1},
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["source_url", "finding"],
+            "additionalProperties": false,
+            "properties": {
+              "source_url": {"$ref": "#/$defs/officialUrl"},
+              "finding": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "checked_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "officialUrl": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://(?:api\\.github\\.com|github\\.com|raw\\.githubusercontent\\.com|docs\\.getoutline\\.com|docs\\.prefect\\.io|docling-project\\.github\\.io|docs\\.ragflow\\.io|docs\\.langfuse\\.com|langfuse\\.com|docker\\.langfuse\\.com|docs\\.clamav\\.net|huggingface\\.co|hub\\.docker\\.com|ghcr\\.io|quay\\.io|registry-1\\.docker\\.io|pypi\\.org|download\\.documentfoundation\\.org|www\\.libreoffice\\.org|packages\\.ubuntu\\.com|archive\\.ubuntu\\.com|mineru\\.net|docs\\.mineru\\.net|openspg\\.com)(?:/|$)"
+    },
+    "immutableRef": {"type": "string", "minLength": 1, "pattern": "^(?!(?:[Ll][Aa][Tt][Ee][Ss][Tt]|[Mm][Aa][Ii][Nn]|[Mm][Aa][Ss][Tt][Ee][Rr]|[Nn][Ii][Gg][Hh][Tt][Ll][Yy]|[Dd][Ee][Vv])$).+"},
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "bareSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "license": {
+      "type": "object",
+      "required": ["id", "source_url"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"enum": ["AGPL-3.0-only", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSL-1.1", "GPL-2.0-only", "GPL-3.0-only", "MIT", "MPL-2.0"]},
+        "source_url": {"$ref": "#/$defs/officialUrl"}
+      }
+    },
+    "artifact": {
+      "oneOf": [
+        {"$ref": "#/$defs/imageArtifact"},
+        {"$ref": "#/$defs/fetchedModelArtifact"},
+        {"$ref": "#/$defs/embeddedModelArtifact"},
+        {"$ref": "#/$defs/nativePackageArtifact"}
+      ]
+    },
+    "imageArtifact": {
+      "type": "object",
+      "required": ["kind", "role", "name", "tag_or_version", "digest_or_checksum", "manifest_digest", "linux_amd64_digest", "platform", "source_url"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"const": "image"},
+        "role": {"enum": ["main", "dependency"]},
+        "name": {"type": "string", "minLength": 1},
+        "tag_or_version": {"$ref": "#/$defs/immutableRef"},
+        "digest_or_checksum": {"$ref": "#/$defs/sha256"},
+        "manifest_digest": {"$ref": "#/$defs/sha256"},
+        "linux_amd64_digest": {"$ref": "#/$defs/sha256"},
+        "platform": {"const": "linux/amd64"},
+        "source_url": {"$ref": "#/$defs/officialUrl"}
+      }
+    },
+    "fetchedModelArtifact": {
+      "type": "object",
+      "required": ["kind", "role", "name", "revision", "checksum", "source_url", "license"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"const": "model"},
+        "role": {"const": "runtime-model"},
+        "name": {"type": "string", "minLength": 1},
+        "revision": {"$ref": "#/$defs/immutableRef"},
+        "checksum": {"$ref": "#/$defs/sha256"},
+        "source_url": {"$ref": "#/$defs/officialUrl"},
+        "license": {"$ref": "#/$defs/license"}
+      }
+    },
+    "embeddedModelArtifact": {
+      "type": "object",
+      "required": ["kind", "role", "name", "embedded_in_image", "image_digest", "proving_source_url", "license"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"const": "model"},
+        "role": {"const": "runtime-model"},
+        "name": {"type": "string", "minLength": 1},
+        "embedded_in_image": {"const": true},
+        "image_digest": {"$ref": "#/$defs/sha256"},
+        "proving_source_url": {"$ref": "#/$defs/officialUrl"},
+        "license": {"$ref": "#/$defs/license"}
+      }
+    },
+    "nativePackageArtifact": {
+      "type": "object",
+      "required": ["kind", "name", "installed_version", "candidate_version", "package_filename", "digest_or_checksum", "source_url", "repository"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"const": "native-package"},
+        "name": {"type": "string", "minLength": 1},
+        "installed_version": {"$ref": "#/$defs/immutableRef"},
+        "candidate_version": {"$ref": "#/$defs/immutableRef"},
+        "package_filename": {"type": "string", "minLength": 1},
+        "digest_or_checksum": {"$ref": "#/$defs/sha256"},
+        "source_url": {"$ref": "#/$defs/officialUrl"},
+        "repository": {
+          "type": "object",
+          "required": ["id", "source_url"],
+          "additionalProperties": false,
+          "properties": {
+            "id": {"type": "string", "minLength": 1},
+            "source_url": {"$ref": "#/$defs/officialUrl"}
+          }
+        }
+      }
+    },
+    "closure": {
+      "type": "object",
+      "required": ["deployment_images", "runtime_models"],
+      "additionalProperties": false,
+      "properties": {
+        "deployment_images": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "runtime_models": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "required": ["upstream_ref", "upstream_sha256", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "upstream_ref": {"$ref": "#/$defs/immutableRef"},
+        "upstream_sha256": {"$ref": "#/$defs/bareSha256"},
+        "path": {"type": "string", "pattern": "^runtime/(?:outline|prefect|docling-serve|mineru|ragflow|langfuse|libreoffice|clamav|kag-poc)/(?:compose\\.upstream\\.yaml|deployment\\.md)$"}
+      }
+    },
+    "resources": {
+      "type": "object",
+      "required": ["min_available_ram_gib", "min_free_disk_gib", "vm_max_map_count"],
+      "additionalProperties": false,
+      "properties": {
+        "min_available_ram_gib": {"type": "number", "minimum": 0},
+        "min_free_disk_gib": {"type": "number", "minimum": 0},
+        "vm_max_map_count": {"type": ["integer", "null"], "minimum": 0}
+      }
+    },
+    "runtimeIdentity": {
+      "type": "object",
+      "required": ["uid", "gid", "allow_root"],
+      "additionalProperties": false,
+      "properties": {
+        "uid": {"type": "integer", "minimum": 0},
+        "gid": {"type": "integer", "minimum": 0},
+        "allow_root": {"type": "boolean"}
+      }
+    },
+    "persistentPath": {
+      "type": "object",
+      "required": ["path", "owner_uid", "owner_gid", "mode"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {"type": "string", "pattern": "^runtime/"},
+        "owner_uid": {"type": "integer", "minimum": 0},
+        "owner_gid": {"type": "integer", "minimum": 0},
+        "mode": {"type": "string", "pattern": "^0[0-7]{3}$"}
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "required": ["secret_keys"],
+      "additionalProperties": false,
+      "properties": {
+        "secret_keys": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}},
+        "no_secrets_required": {"const": true}
+      },
+      "oneOf": [
+        {"properties": {"secret_keys": {"minItems": 1}}, "not": {"required": ["no_secrets_required"]}},
+        {"required": ["no_secrets_required"], "properties": {"secret_keys": {"maxItems": 0}}}
+      ]
+    }
+  }
+}

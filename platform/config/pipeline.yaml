@@ -1,0 +1,17 @@
+# schema: xmg-kb/pipeline
+# version: 1
+phase_0:
+  source_of_truth: platform/config/source-of-truth.yaml
+  tracked_placeholders:
+    - docs/architecture
+    - docs/operations
+    - docs/decisions
+    - runtime
+    - state
+    - knowledge
+    - exports
+phase_1:
+  schema_test: platform/tests/phase1/test_schema_foundation.py
+  schemas:
+    components_lock: platform/schemas/components-lock.schema.json
+    component_verification: platform/schemas/component-verification.schema.json

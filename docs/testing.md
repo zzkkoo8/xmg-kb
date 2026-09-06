@@ -16,7 +16,7 @@
 
 覆盖：
 
-- BookStack API；
+- Outline API/MCP；
 - Docling Serve；
 - RAGFlow；
 - Langfuse；

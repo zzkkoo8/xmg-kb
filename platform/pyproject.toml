@@ -1,0 +1,14 @@
+[project]
+name = "xmg-kb-platform"
+version = "0.1.0"
+description = "Project contract skeleton for the xmg-kb migration workspace."
+requires-python = ">=3.12"
+dependencies = [
+    "PyYAML==6.0.3",
+    "jsonschema==4.10.3",
+    "Pillow==12.3.0",
+    "reportlab==5.0.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

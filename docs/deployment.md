@@ -8,7 +8,7 @@ xmg-kb 不把所有上游产品重做成一个巨型自定义 Compose。
 
 ```text
 deploy/
-├── bookstack/
+├── outline/
 ├── prefect/
 ├── docling-serve/
 ├── mineru/
@@ -77,7 +77,7 @@ restore
 
 ### Core
 
-- BookStack；
+- Outline；
 - Prefect；
 - Project API/MCP Adapter。
 

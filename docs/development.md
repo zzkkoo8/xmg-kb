@@ -34,7 +34,7 @@ mypy/pyright（按项目最终选择）
 
 Adapter 只封装上游稳定接口：
 
-- BookStack；
+- Outline；
 - Prefect；
 - Docling Serve；
 - MinerU；

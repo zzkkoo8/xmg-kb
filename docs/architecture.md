@@ -60,14 +60,14 @@ Knowledge Governance
   ├─ Conflict
   └─ Canonicalization
           ↓
-BookStack Review
+Outline 90-Review
           ↓
 Human Approval
           ↓
-BookStack Canonical Wiki
+Outline Canonical Collections
         ├─────────────────────────┐
         ↓                         ↓
-BookStack REST API          Canonical-only Sync
+Outline API/MCP + Webhook   Canonical-only Sync
         ↓                         ↓
 Knowledge-management AI       RAGFlow
                               ├─ Parser
@@ -86,9 +86,9 @@ Knowledge-management AI       RAGFlow
                               Review Queue
 ```
 
-## 3. Human Wiki：BookStack
+## 3. Human Wiki：Outline
 
-BookStack 作为默认 Canonical Wiki。
+Outline 作为 v7 默认 Canonical Wiki。
 
 选择理由：
 
@@ -107,12 +107,12 @@ BookStack 作为默认 Canonical Wiki。
 - Export / Import；
 - 运维和备份文档成熟。
 
-AI 不直接操作 BookStack 数据库。
+AI 不直接操作 Outline 数据库。
 
 自动化统一使用：
 
 ```text
-BookStack REST API
+Outline API / MCP
 ```
 
 标准 Agent 接口通过一个薄的 `xmgkb-mcp` 适配层暴露。
@@ -262,7 +262,7 @@ PATCH > CREATE
 Production 只索引：
 
 ```text
-BookStack Canonical
+Outline Canonical
 ```
 
 禁止：
@@ -377,7 +377,7 @@ Langfuse 负责：
 ```text
 Evidence Search
 → CREATE / PATCH / CONFLICT_REVIEW
-→ BookStack Review
+→ Outline 90-Review
 → Human Approval
 ```
 

@@ -15,40 +15,38 @@
 
 ## 2. Human Wiki
 
-### 默认：BookStack
+### 默认：Outline
 
 结论：采用。
 
 原因：
 
-- MIT；
 - 自托管；
 - 长期活跃；
-- WYSIWYG + Markdown；
-- Books / Chapters / Pages；
-- Search / Tags；
+- 高质量协作编辑体验；
+- Collections / Nested Documents；
+- Search；
 - Attachments；
-- Page History；
+- Document History；
 - Permissions；
 - Webhooks；
-- 内置 REST API；
+- API / MCP；
 - Export / Import；
 - 运维和安全文档成熟。
 
-BookStack API 文档随实例提供在 `/api/docs`，自动化使用受权限约束的 API Token。
+Outline 当前采用 BSL 1.1，属于 source-available 而不是严格 OSI 开源；这是 v7 明确记录的许可证例外。若未来强制 100% OSI，再通过独立 ADR 评估替代品，不在当前主链并行维护两套 Wiki。
 
-AI 通过 REST API 读写 Review；标准 Agent 入口通过薄 `xmgkb-mcp` Adapter 暴露。
+AI 通过 API/MCP 读写 Review；Webhook Adapter 负责把审核和 Revision 变化同步回状态库。
 
-### Outline
+### BookStack
 
-不作为默认开源基线。
+不作为当前 v7 默认基线。
 
 原因：
 
-- UX 和第一方 API/MCP 很强；
-- 但当前 BSL 1.1 明确不是 Open Source License。
-
-如果部署环境接受 Source-Available，可作为 Alternative Profile。
+- 虽然 MIT 且运维成熟，但它不是当前设计已选定并配置的 Canonical Wiki；
+- 切换会导致 Outline Collection、API/MCP、Webhook 和 Mapping 合同整体变化；
+- 未经新 ADR 与迁移验证，不得替换当前主链。
 
 ### Docmost
 
@@ -180,7 +178,7 @@ KAG 当前 Apache-2.0，定位为专业领域知识构建与推理框架。
 
 只封装：
 
-- BookStack REST API；
+- Outline API/MCP；
 - RAG Search；
 - Provenance Lookup。
 
@@ -205,8 +203,8 @@ xmg-kb 分发：
 
 ## 10. 官方参考
 
-- BookStack: https://www.bookstackapp.com/docs/
-- BookStack Source: https://codeberg.org/bookstack/bookstack
+- Outline: https://docs.getoutline.com/
+- Outline Source: https://github.com/outline/outline
 - Prefect: https://github.com/PrefectHQ/prefect
 - Docling: https://github.com/docling-project/docling
 - Docling Serve: https://github.com/docling-project/docling-serve

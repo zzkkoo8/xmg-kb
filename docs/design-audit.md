@@ -144,19 +144,18 @@ Reparse / Re-LLM
 
 早期方案默认 Outline。
 
-重新以“成熟 + 自托管 + 开源 + 稳定 API + AI 可读写 + 易分发”审计后，当前公开基线改为 BookStack：
+v7 以“成熟 + 自托管 + 稳定 API/MCP + AI 可读写 + 人类编辑体验”审计后，当前基线保持 Outline：
 
-- MIT；
-- REST API；
-- Markdown + WYSIWYG；
-- Hierarchy；
+- Collections / Nested Documents；
+- API / MCP；
+- 协作编辑；
 - History；
 - Attachment；
 - Permission；
 - Webhook；
 - Import/Export。
 
-Outline 保留为 Source-Available Alternative，不作为默认开源 Profile。
+Outline 的 BSL 1.1 属于 source-available 而不是严格 OSI 开源；v7 将其作为透明记录的许可证例外。若未来强制 100% OSI，必须通过新 ADR、数据迁移和完整验收后再替换，不能在当前主链混用两个 Wiki。
 
 ## 4. 最终不变的核心原则
 
@@ -172,7 +171,7 @@ Code Exists != PASS
 ## 5. 当前公共架构基线
 
 ```text
-BookStack
+Outline
 +
 Prefect
 +

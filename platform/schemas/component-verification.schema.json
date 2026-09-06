@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xmg-kb.local/schemas/component-verification.schema.json",
+  "title": "Phase 1 component verification foundation",
+  "type": "object",
+  "required": ["component", "capabilities"],
+  "additionalProperties": true,
+  "properties": {
+    "component": {
+      "enum": [
+        "outline",
+        "prefect",
+        "docling-serve",
+        "mineru",
+        "ragflow",
+        "langfuse",
+        "libreoffice",
+        "clamav",
+        "kag-poc"
+      ]
+    },
+    "capabilities": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"$ref": "#/$defs/capability"}
+    }
+  },
+  "$defs": {
+    "capability": {
+      "type": "object",
+      "required": ["status", "reason"],
+      "additionalProperties": true,
+      "properties": {
+        "status": {"enum": ["PASS", "BLOCKED", "N/A"]},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

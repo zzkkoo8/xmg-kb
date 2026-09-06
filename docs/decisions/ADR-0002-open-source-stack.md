@@ -1,4 +1,4 @@
-# ADR-0002：默认开源组件基线
+# ADR-0002：默认自托管组件基线
 
 **Status:** Accepted
 
@@ -11,7 +11,7 @@
 默认主链：
 
 ```text
-BookStack
+Outline
 Prefect
 Docling Serve
 MinerU fallback
@@ -24,17 +24,17 @@ KAG/OpenSPG POC
 AI Wiki 标准接口：
 
 ```text
-BookStack REST API
+Outline API/MCP
 +
-thin xmgkb-mcp adapter
+Webhook / State adapter
 ```
 
-## Why BookStack
+## Why Outline
 
-- MIT；
 - 自托管；
-- WYSIWYG + Markdown；
-- REST API；
+- 协作编辑体验；
+- Collections / Nested Documents；
+- API / MCP；
 - 权限；
 - History；
 - Attachment；
@@ -43,16 +43,18 @@ thin xmgkb-mcp adapter
 
 ## Alternatives
 
-### Outline
+### BookStack
 
 优点：
 
-- UX 强；
-- 第一方 API/MCP 强。
+- MIT；
+- 运维成熟；
+- REST API。
 
 未默认选择：
 
-- 当前 BSL 1.1 不是 Open Source License。
+- 与 v7 已选定的 Outline Collection、API/MCP、Webhook 和 Mapping 合同不一致；
+- 未完成替换所需的迁移与验收。
 
 ### Docmost
 
@@ -67,8 +69,8 @@ thin xmgkb-mcp adapter
 
 ## Consequences
 
-- 公共架构满足“开源优先”；
-- 需要维护一个很薄的 MCP Adapter；
+- Outline 是明确记录的 source-available 许可证例外；
+- 需要维护很薄的 Webhook / State Adapter；
 - 上游组件保持独立升级，不 fork。
 
 ## Validation
@@ -76,7 +78,7 @@ thin xmgkb-mcp adapter
 在 Human Wiki POC 阶段验证：
 
 - 编辑体验；
-- REST API；
+- API / MCP；
 - 权限；
 - History；
 - Backup/Restore；

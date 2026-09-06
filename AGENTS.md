@@ -70,7 +70,7 @@ Inspect
 
 默认主链：
 
-- BookStack
+- Outline
 - Prefect
 - Docling Serve
 - MinerU fallback
@@ -136,7 +136,7 @@ Evidence
 → Derived RAG Index
 ```
 
-BookStack Canonical Pages 是人类可维护的权威知识层。
+Outline Canonical Collections 是人类可维护的权威知识层。
 
 RAGFlow 是派生索引，不是事实源。
 

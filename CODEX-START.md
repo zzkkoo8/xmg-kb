@@ -87,8 +87,8 @@ Evidence
 → Docling Serve / MinerU
 → Document Governance
 → Knowledge Engineering
-→ BookStack Review
-→ BookStack Canonical
+→ Outline 90-Review
+→ Outline Canonical Collections
 → RAGFlow Parser / Chunker / Indexer
 → Hybrid Retrieval / Rerank
 → AI QA

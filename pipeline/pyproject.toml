@@ -1,0 +1,16 @@
+[project]
+name = "kb-pipeline"
+version = "0.1.0"
+description = "xmg-kb knowledge governance pipeline (raw-book -> xmg-kb)"
+requires-python = ">=3.11"
+
+[project.scripts]
+kbctl = "kb_pipeline.kbctl:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["kb_pipeline"]

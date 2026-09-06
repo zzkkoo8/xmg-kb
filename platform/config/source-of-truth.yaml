@@ -1,0 +1,7 @@
+# schema: xmg-kb/source-of-truth
+# version: 1
+project_root: /srv/xmg-kb
+raw_evidence: /srv/xmg-kb/evidence
+legacy_curated_source: /srv/xmg-kb/legacy
+authoritative_human_store: migration_pending
+production_rag_source: disabled

@@ -13,7 +13,7 @@
 ```text
 Evidence
 → Governance
-→ BookStack Canonical
+→ Outline Canonical
 → RAGFlow Derived Index
 ```
 

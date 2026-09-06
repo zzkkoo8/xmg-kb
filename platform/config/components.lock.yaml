@@ -1,0 +1,344 @@
+components:
+  outline:
+    gate_role: required
+    resolution_status: BLOCKED
+    blocker: 'Evidence closure failed after attempting: registry: image has no explicit
+      tag; dependency-images: official deployment did not identify exactly one component
+      main image; registry: not every deployment image has manifest-list and linux/amd64
+      digests; resources: official minimum RAM/disk/vm.max_map_count evidence is not
+      machine-closed; runtime: image runtime UID/GID/root policy evidence is not machine-closed;
+      persistence: persistent path owner/GID/mode evidence is not machine-closed;
+      configuration: official secret-key inventory is not machine-closed'
+    evidence:
+    - source_url: https://api.github.com/repos/outline/outline/releases/latest
+      finding: release probe returned HTTP 200 from verified final URL https://api.github.com/repos/outline/outline/releases/latest
+    - source_url: https://api.github.com/repos/outline/outline/releases/latest
+      finding: parsed pinned official release tag v1.9.2
+    - source_url: https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
+      finding: docs probe returned HTTP 200 from verified final URL https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
+    - source_url: https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
+      finding: resources evidence inspection parsed 11688 official documentation bytes;
+        no typed markers matched
+    - source_url: https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
+      finding: 'runtime evidence inspection parsed 11688 official documentation bytes;
+        matched terms: root, user'
+    - source_url: https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
+      finding: 'persistence evidence inspection parsed 11688 official documentation
+        bytes; matched terms: data, storage, volume'
+    - source_url: https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
+      finding: 'configuration evidence inspection parsed 11688 official documentation
+        bytes; matched terms: environment, password, secret'
+    - source_url: https://raw.githubusercontent.com/outline/outline/v1.9.2/LICENSE
+      finding: license probe returned HTTP 200 from verified final URL https://raw.githubusercontent.com/outline/outline/v1.9.2/LICENSE
+    - source_url: https://raw.githubusercontent.com/outline/outline/v1.9.2/docker-compose.yml
+      finding: deployment probe returned HTTP 200 from verified final URL https://raw.githubusercontent.com/outline/outline/v1.9.2/docker-compose.yml
+    checked_at: '2026-09-01T03:41:41Z'
+  prefect:
+    gate_role: required
+    resolution_status: BLOCKED
+    blocker: 'Evidence closure failed after attempting: deployment: no pinned official
+      deployment candidate found; resources: official minimum RAM/disk/vm.max_map_count
+      evidence is not machine-closed; runtime: image runtime UID/GID/root policy evidence
+      is not machine-closed; persistence: persistent path owner/GID/mode evidence
+      is not machine-closed; configuration: official secret-key inventory is not machine-closed'
+    evidence:
+    - source_url: https://api.github.com/repos/PrefectHQ/prefect/releases/latest
+      finding: release probe returned HTTP 200 from verified final URL https://api.github.com/repos/PrefectHQ/prefect/releases/latest
+    - source_url: https://api.github.com/repos/PrefectHQ/prefect/releases/latest
+      finding: parsed pinned official release tag 3.8.4
+    - source_url: https://docs.prefect.io/v3/how-to-guides/self-hosted/server/
+      finding: docs probe returned HTTP 200 from verified final URL https://docs.prefect.io/v3/get-started
+    - source_url: https://docs.prefect.io/v3/how-to-guides/self-hosted/server/
+      finding: 'resources evidence inspection parsed 303200 official documentation
+        bytes; matched terms: ram'
+    - source_url: https://docs.prefect.io/v3/how-to-guides/self-hosted/server/
+      finding: 'runtime evidence inspection parsed 303200 official documentation bytes;
+        matched terms: gid, root, uid, user'
+    - source_url: https://docs.prefect.io/v3/how-to-guides/self-hosted/server/
+      finding: 'persistence evidence inspection parsed 303200 official documentation
+        bytes; matched terms: data, permission, storage'
+    - source_url: https://docs.prefect.io/v3/how-to-guides/self-hosted/server/
+      finding: 'configuration evidence inspection parsed 303200 official documentation
+        bytes; matched terms: environment, secret, token'
+    - source_url: https://raw.githubusercontent.com/PrefectHQ/prefect/3.8.4/LICENSE
+      finding: license probe returned HTTP 200 from verified final URL https://raw.githubusercontent.com/PrefectHQ/prefect/3.8.4/LICENSE
+    - source_url: https://raw.githubusercontent.com/PrefectHQ/prefect/3.8.4/docker-compose.yml
+      finding: deployment probe returned HTTP 404
+    - source_url: https://raw.githubusercontent.com/PrefectHQ/prefect/3.8.4/docker-compose.yaml
+      finding: deployment probe returned HTTP 404
+    checked_at: '2026-09-01T03:41:41Z'
+  docling-serve:
+    gate_role: required
+    resolution_status: BLOCKED
+    blocker: 'Evidence closure failed after attempting: deployment: no pinned official
+      deployment candidate found; model file checksum: probe raised an exception;
+      model: model-file checksums missing for tokenizer.json at https://huggingface.co/api/models/ibm-granite/granite-docling-258M?blobs=true;
+      model: not every expected model has revision/checksum/license closure; resources:
+      official minimum RAM/disk/vm.max_map_count evidence is not machine-closed; runtime:
+      image runtime UID/GID/root policy evidence is not machine-closed; persistence:
+      persistent path owner/GID/mode evidence is not machine-closed; configuration:
+      official secret-key inventory is not machine-closed'
+    evidence:
+    - source_url: https://api.github.com/repos/docling-project/docling-serve/releases/latest
+      finding: release probe returned HTTP 200 from verified final URL https://api.github.com/repos/docling-project/docling-serve/releases/latest
+    - source_url: https://api.github.com/repos/docling-project/docling-serve/releases/latest
+      finding: parsed pinned official release tag v1.31.0
+    - source_url: https://github.com/docling-project/docling-serve
+      finding: docs probe returned HTTP 200 from verified final URL https://github.com/docling-project/docling-serve
+    - source_url: https://github.com/docling-project/docling-serve
+      finding: 'resources evidence inspection parsed 347887 official documentation
+        bytes; matched terms: ram'
+    - source_url: https://github.com/docling-project/docling-serve
+      finding: 'runtime evidence inspection parsed 347887 official documentation bytes;
+        matched terms: root, uid, user'
+    - source_url: https://github.com/docling-project/docling-serve
+      finding: 'persistence evidence inspection parsed 347887 official documentation
+        bytes; matched terms: data'
+    - source_url: https://github.com/docling-project/docling-serve
+      finding: 'configuration evidence inspection parsed 347887 official documentation
+        bytes; matched terms: environment, secret, token'
+    - source_url: https://raw.githubusercontent.com/docling-project/docling-serve/v1.31.0/LICENSE
+      finding: license probe returned HTTP 200 from verified final URL https://raw.githubusercontent.com/docling-project/docling-serve/v1.31.0/LICENSE
+    - source_url: https://raw.githubusercontent.com/docling-project/docling-serve/v1.31.0/docker-compose.yml
+      finding: deployment probe returned HTTP 404
+    - source_url: https://raw.githubusercontent.com/docling-project/docling-serve/v1.31.0/docker-compose.yaml
+      finding: deployment probe returned HTTP 404
+    - source_url: https://huggingface.co/api/models/ibm-granite/granite-docling-258M?blobs=true
+      finding: model metadata probe returned HTTP 200 from verified final URL https://huggingface.co/api/models/ibm-granite/granite-docling-258M?blobs=true
+    - source_url: https://huggingface.co/ibm-granite/granite-docling-258M/resolve/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/added_tokens.json
+      finding: model file checksum probe returned HTTP 200 from verified final URL
+        https://huggingface.co/api/resolve-cache/models/ibm-granite/granite-docling-258M/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/added_tokens.json?%2Fibm-granite%2Fgranite-docling-258M%2Fresolve%2F982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe%2Fadded_tokens.json=&etag=%222895b6710d6bb8d5e7cc5d1137d79eff8ad06df2%22
+    - source_url: https://huggingface.co/ibm-granite/granite-docling-258M/resolve/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/config.json
+      finding: model file checksum probe returned HTTP 200 from verified final URL
+        https://huggingface.co/api/resolve-cache/models/ibm-granite/granite-docling-258M/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/config.json?%2Fibm-granite%2Fgranite-docling-258M%2Fresolve%2F982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe%2Fconfig.json=&etag=%226a652f5b56550a9291c6a6bb019ade3744a8c8bb%22
+    - source_url: https://huggingface.co/ibm-granite/granite-docling-258M/resolve/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/generation_config.json
+      finding: model file checksum probe returned HTTP 200 from verified final URL
+        https://huggingface.co/api/resolve-cache/models/ibm-granite/granite-docling-258M/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/generation_config.json?%2Fibm-granite%2Fgranite-docling-258M%2Fresolve%2F982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe%2Fgeneration_config.json=&etag=%22172b1f940804da1f6d8b8c2a807e0f3163122211%22
+    - source_url: https://huggingface.co/ibm-granite/granite-docling-258M/resolve/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/merges.txt
+      finding: model file checksum probe returned HTTP 200 from verified final URL
+        https://huggingface.co/api/resolve-cache/models/ibm-granite/granite-docling-258M/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/merges.txt?%2Fibm-granite%2Fgranite-docling-258M%2Fresolve%2F982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe%2Fmerges.txt=&etag=%22354558edcdbd64ca7abd407b8be3d5d09d39d781%22
+    - source_url: https://huggingface.co/ibm-granite/granite-docling-258M/resolve/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/preprocessor_config.json
+      finding: model file checksum probe returned HTTP 200 from verified final URL
+        https://huggingface.co/api/resolve-cache/models/ibm-granite/granite-docling-258M/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/preprocessor_config.json?%2Fibm-granite%2Fgranite-docling-258M%2Fresolve%2F982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe%2Fpreprocessor_config.json=&etag=%22893236748032d4bf033823d6a4a0d62b78b6bc0e%22
+    - source_url: https://huggingface.co/ibm-granite/granite-docling-258M/resolve/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/processor_config.json
+      finding: model file checksum probe returned HTTP 200 from verified final URL
+        https://huggingface.co/api/resolve-cache/models/ibm-granite/granite-docling-258M/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/processor_config.json?%2Fibm-granite%2Fgranite-docling-258M%2Fresolve%2F982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe%2Fprocessor_config.json=&etag=%22b3b1deadd0e6e18c2070fdb0c29074892ea58ffe%22
+    - source_url: https://huggingface.co/ibm-granite/granite-docling-258M/resolve/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/special_tokens_map.json
+      finding: model file checksum probe returned HTTP 200 from verified final URL
+        https://huggingface.co/api/resolve-cache/models/ibm-granite/granite-docling-258M/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/special_tokens_map.json?%2Fibm-granite%2Fgranite-docling-258M%2Fresolve%2F982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe%2Fspecial_tokens_map.json=&etag=%22e8e87b5f11beb05b0c8205811fc65d27d895ccc0%22
+    - source_url: https://huggingface.co/ibm-granite/granite-docling-258M/resolve/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/tokenizer.json
+      finding: 'model file checksum probe failed: RuntimeError: response exceeded
+        2097152 bytes'
+    - source_url: https://huggingface.co/ibm-granite/granite-docling-258M/resolve/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/tokenizer_config.json
+      finding: model file checksum probe returned HTTP 200 from verified final URL
+        https://huggingface.co/api/resolve-cache/models/ibm-granite/granite-docling-258M/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/tokenizer_config.json?%2Fibm-granite%2Fgranite-docling-258M%2Fresolve%2F982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe%2Ftokenizer_config.json=&etag=%221b20bc7d876f053bf0bc1ef0fb25ef24e1ef6a61%22
+    - source_url: https://huggingface.co/ibm-granite/granite-docling-258M/resolve/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/vocab.json
+      finding: model file checksum probe returned HTTP 200 from verified final URL
+        https://huggingface.co/api/resolve-cache/models/ibm-granite/granite-docling-258M/982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe/vocab.json?%2Fibm-granite%2Fgranite-docling-258M%2Fresolve%2F982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe%2Fvocab.json=&etag=%2207fe068601babcefc22b1f9ce254ed0eede3d7fd%22
+    checked_at: '2026-09-01T03:41:41Z'
+  mineru:
+    gate_role: required
+    resolution_status: BLOCKED
+    blocker: 'Evidence closure failed after attempting: registry: image mineru:latest
+      contains mutable ref: latest; dependency-images: official deployment did not
+      identify exactly one component main image; registry: not every deployment image
+      has manifest-list and linux/amd64 digests; model: bounded auxiliary model-file
+      checksum probe limit exceeded (48 > 16) at https://huggingface.co/api/models/opendatalab/PDF-Extract-Kit-1.0?blobs=true;
+      model: not every expected model has revision/checksum/license closure; resources:
+      official minimum RAM/disk/vm.max_map_count evidence is not machine-closed; runtime:
+      image runtime UID/GID/root policy evidence is not machine-closed; persistence:
+      persistent path owner/GID/mode evidence is not machine-closed; configuration:
+      official secret-key inventory is not machine-closed'
+    evidence:
+    - source_url: https://api.github.com/repos/opendatalab/MinerU/releases/latest
+      finding: release probe returned HTTP 200 from verified final URL https://api.github.com/repos/opendatalab/MinerU/releases/latest
+    - source_url: https://api.github.com/repos/opendatalab/MinerU/releases/latest
+      finding: parsed pinned official release tag mineru-3.4.5-released
+    - source_url: https://github.com/opendatalab/MinerU
+      finding: docs probe returned HTTP 200 from verified final URL https://github.com/opendatalab/MinerU
+    - source_url: https://github.com/opendatalab/MinerU
+      finding: 'resources evidence inspection parsed 508921 official documentation
+        bytes; matched terms: disk, memory, ram'
+    - source_url: https://github.com/opendatalab/MinerU
+      finding: 'runtime evidence inspection parsed 508921 official documentation bytes;
+        matched terms: gid, root, uid, user'
+    - source_url: https://github.com/opendatalab/MinerU
+      finding: 'persistence evidence inspection parsed 508921 official documentation
+        bytes; matched terms: data'
+    - source_url: https://github.com/opendatalab/MinerU
+      finding: 'configuration evidence inspection parsed 508921 official documentation
+        bytes; matched terms: environment, secret, token'
+    - source_url: https://raw.githubusercontent.com/opendatalab/MinerU/mineru-3.4.5-released/LICENSE
+      finding: license probe returned HTTP 404
+    - source_url: https://raw.githubusercontent.com/opendatalab/MinerU/mineru-3.4.5-released/LICENSE.md
+      finding: license probe returned HTTP 200 from verified final URL https://raw.githubusercontent.com/opendatalab/MinerU/mineru-3.4.5-released/LICENSE.md
+    - source_url: https://raw.githubusercontent.com/opendatalab/MinerU/mineru-3.4.5-released/docker-compose.yml
+      finding: deployment probe returned HTTP 404
+    - source_url: https://raw.githubusercontent.com/opendatalab/MinerU/mineru-3.4.5-released/docker-compose.yaml
+      finding: deployment probe returned HTTP 404
+    - source_url: https://raw.githubusercontent.com/opendatalab/MinerU/mineru-3.4.5-released/docker/compose.yaml
+      finding: deployment probe returned HTTP 200 from verified final URL https://raw.githubusercontent.com/opendatalab/MinerU/mineru-3.4.5-released/docker/compose.yaml
+    - source_url: https://huggingface.co/api/models/opendatalab/PDF-Extract-Kit-1.0?blobs=true
+      finding: model metadata probe returned HTTP 200 from verified final URL https://huggingface.co/api/models/opendatalab/PDF-Extract-Kit-1.0?blobs=true
+    checked_at: '2026-09-01T03:41:41Z'
+  ragflow:
+    gate_role: required
+    resolution_status: BLOCKED
+    blocker: 'Evidence closure failed after attempting: docs: probe raised an exception;
+      docs: official docs URL unavailable; dependency-images: unresolved image expressions:
+      ${DEEPDOC_IMAGE:-deepdoc_oss:latest}, ${RAGFLOW_IMAGE}; dependency-images: pinned
+      deployment yielded no literal image inventory; dependency-images: official deployment
+      did not identify exactly one component main image; model: official deployment
+      does not close the runtime model inventory; resources: official minimum RAM/disk/vm.max_map_count
+      evidence is not machine-closed; runtime: image runtime UID/GID/root policy evidence
+      is not machine-closed; persistence: persistent path owner/GID/mode evidence
+      is not machine-closed; configuration: official secret-key inventory is not machine-closed'
+    evidence:
+    - source_url: https://api.github.com/repos/infiniflow/ragflow/releases/latest
+      finding: release probe returned HTTP 200 from verified final URL https://api.github.com/repos/infiniflow/ragflow/releases/latest
+    - source_url: https://api.github.com/repos/infiniflow/ragflow/releases/latest
+      finding: parsed pinned official release tag v0.27.1
+    - source_url: https://docs.ragflow.io/
+      finding: 'docs probe failed: URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING]
+        EOF occurred in violation of protocol (_ssl.c:1000)>'
+    - source_url: https://raw.githubusercontent.com/infiniflow/ragflow/v0.27.1/LICENSE
+      finding: license probe returned HTTP 200 from verified final URL https://raw.githubusercontent.com/infiniflow/ragflow/v0.27.1/LICENSE
+    - source_url: https://raw.githubusercontent.com/infiniflow/ragflow/v0.27.1/docker/docker-compose.yml
+      finding: deployment probe returned HTTP 200 from verified final URL https://raw.githubusercontent.com/infiniflow/ragflow/v0.27.1/docker/docker-compose.yml
+    checked_at: '2026-09-01T03:41:41Z'
+  langfuse:
+    gate_role: required
+    resolution_status: BLOCKED
+    blocker: 'Evidence closure failed after attempting: dependency-images: unresolved
+      image expressions: docker.io/postgres:${POSTGRES_VERSION:-17}; registry: manifest
+      unavailable for docker.langfuse.com/langfuse/langfuse-worker:4; registry: manifest
+      unavailable for docker.langfuse.com/langfuse/langfuse:4; registry: image has
+      no explicit tag; registry: not every deployment image has manifest-list and
+      linux/amd64 digests; resources: official minimum RAM/disk/vm.max_map_count evidence
+      is not machine-closed; runtime: image runtime UID/GID/root policy evidence is
+      not machine-closed; persistence: persistent path owner/GID/mode evidence is
+      not machine-closed; configuration: official secret-key inventory is not machine-closed'
+    evidence:
+    - source_url: https://api.github.com/repos/langfuse/langfuse/releases/latest
+      finding: release probe returned HTTP 200 from verified final URL https://api.github.com/repos/langfuse/langfuse/releases/latest
+    - source_url: https://api.github.com/repos/langfuse/langfuse/releases/latest
+      finding: parsed pinned official release tag v4.26.0
+    - source_url: https://langfuse.com/self-hosting/deployment/docker-compose
+      finding: docs probe returned HTTP 200 from verified final URL https://langfuse.com/self-hosting/deployment/docker-compose
+    - source_url: https://langfuse.com/self-hosting/deployment/docker-compose
+      finding: 'resources evidence inspection parsed 455986 official documentation
+        bytes; matched terms: disk, memory, ram'
+    - source_url: https://langfuse.com/self-hosting/deployment/docker-compose
+      finding: 'runtime evidence inspection parsed 455986 official documentation bytes;
+        matched terms: root, uid, user'
+    - source_url: https://langfuse.com/self-hosting/deployment/docker-compose
+      finding: 'persistence evidence inspection parsed 455986 official documentation
+        bytes; matched terms: data, permission, storage, volume'
+    - source_url: https://langfuse.com/self-hosting/deployment/docker-compose
+      finding: 'configuration evidence inspection parsed 455986 official documentation
+        bytes; matched terms: environment, password, secret'
+    - source_url: https://raw.githubusercontent.com/langfuse/langfuse/v4.26.0/LICENSE
+      finding: license probe returned HTTP 200 from verified final URL https://raw.githubusercontent.com/langfuse/langfuse/v4.26.0/LICENSE
+    - source_url: https://raw.githubusercontent.com/langfuse/langfuse/v4.26.0/docker-compose.yml
+      finding: deployment probe returned HTTP 200 from verified final URL https://raw.githubusercontent.com/langfuse/langfuse/v4.26.0/docker-compose.yml
+    - source_url: https://docker.langfuse.com/v2/langfuse/langfuse-worker/manifests/4
+      finding: registry manifest probe returned HTTP 401
+    - source_url: https://docker.langfuse.com/v2/langfuse/langfuse/manifests/4
+      finding: registry manifest probe returned HTTP 401
+    - source_url: https://registry-1.docker.io/v2/clickhouse/clickhouse-server/manifests/25.12
+      finding: registry manifest probe returned HTTP 200 from verified final URL https://registry-1.docker.io/v2/clickhouse/clickhouse-server/manifests/25.12
+    - source_url: https://registry-1.docker.io/v2/library/redis/manifests/7
+      finding: registry manifest probe returned HTTP 200 from verified final URL https://registry-1.docker.io/v2/library/redis/manifests/7
+    checked_at: '2026-09-01T03:41:41Z'
+  libreoffice:
+    gate_role: required
+    resolution_status: BLOCKED
+    blocker: 'Evidence closure failed after attempting: native-package: installed/candidate/repository/filename/checksum
+      closure is incomplete'
+    evidence:
+    - source_url: https://www.libreoffice.org/download/download-libreoffice/
+      finding: release page probe returned HTTP 200 from verified final URL https://www.libreoffice.org/download/
+    - source_url: https://www.libreoffice.org/get-help/install-howto/linux/
+      finding: docs probe returned HTTP 200 from verified final URL https://www.libreoffice.org/installation-instructions/#linux
+    - source_url: https://www.libreoffice.org/about-us/licenses/
+      finding: license probe returned HTTP 200 from verified final URL https://www.libreoffice.org/licenses/
+    - source_url: https://packages.ubuntu.com/noble-updates/libreoffice
+      finding: native package probe read installed/candidate/version/filename/SHA256
+        from local apt metadata
+    checked_at: '2026-09-01T03:41:41Z'
+  clamav:
+    gate_role: required
+    resolution_status: BLOCKED
+    blocker: 'Evidence closure failed after attempting: license: no pinned official
+      license file found; deployment: no pinned official deployment candidate found;
+      resources: official minimum RAM/disk/vm.max_map_count evidence is not machine-closed;
+      runtime: image runtime UID/GID/root policy evidence is not machine-closed; persistence:
+      persistent path owner/GID/mode evidence is not machine-closed; configuration:
+      official secret-key inventory is not machine-closed'
+    evidence:
+    - source_url: https://api.github.com/repos/Cisco-Talos/clamav/releases/latest
+      finding: release probe returned HTTP 200 from verified final URL https://api.github.com/repos/Cisco-Talos/clamav/releases/latest
+    - source_url: https://api.github.com/repos/Cisco-Talos/clamav/releases/latest
+      finding: parsed pinned official release tag clamav-1.5.4
+    - source_url: https://docs.clamav.net/manual/Installing/Docker.html
+      finding: docs probe returned HTTP 200 from verified final URL https://docs.clamav.net/manual/Installing/Docker.html
+    - source_url: https://docs.clamav.net/manual/Installing/Docker.html
+      finding: 'resources evidence inspection parsed 54440 official documentation
+        bytes; matched terms: disk, memory, ram'
+    - source_url: https://docs.clamav.net/manual/Installing/Docker.html
+      finding: 'runtime evidence inspection parsed 54440 official documentation bytes;
+        matched terms: root, user'
+    - source_url: https://docs.clamav.net/manual/Installing/Docker.html
+      finding: 'persistence evidence inspection parsed 54440 official documentation
+        bytes; matched terms: data, permission, storage, volume'
+    - source_url: https://docs.clamav.net/manual/Installing/Docker.html
+      finding: 'configuration evidence inspection parsed 54440 official documentation
+        bytes; matched terms: environment, token'
+    - source_url: https://raw.githubusercontent.com/Cisco-Talos/clamav/clamav-1.5.4/LICENSE
+      finding: license probe returned HTTP 404
+    - source_url: https://raw.githubusercontent.com/Cisco-Talos/clamav/clamav-1.5.4/LICENSE.md
+      finding: license probe returned HTTP 404
+    - source_url: https://raw.githubusercontent.com/Cisco-Talos/clamav/clamav-1.5.4/COPYING
+      finding: license probe returned HTTP 404
+    - source_url: https://raw.githubusercontent.com/Cisco-Talos/clamav/clamav-1.5.4/docker-compose.yml
+      finding: deployment probe returned HTTP 404
+    - source_url: https://raw.githubusercontent.com/Cisco-Talos/clamav/clamav-1.5.4/docker-compose.yaml
+      finding: deployment probe returned HTTP 404
+    - source_url: https://raw.githubusercontent.com/Cisco-Talos/clamav/clamav-1.5.4/Dockerfile
+      finding: deployment probe returned HTTP 404
+    checked_at: '2026-09-01T03:41:41Z'
+  kag-poc:
+    gate_role: optional
+    resolution_status: BLOCKED
+    blocker: 'Evidence closure failed after attempting: deployment: no pinned official
+      deployment candidate found; model: official deployment does not close the runtime
+      model inventory; resources: official minimum RAM/disk/vm.max_map_count evidence
+      is not machine-closed; runtime: image runtime UID/GID/root policy evidence is
+      not machine-closed; persistence: persistent path owner/GID/mode evidence is
+      not machine-closed; configuration: official secret-key inventory is not machine-closed'
+    evidence:
+    - source_url: https://api.github.com/repos/OpenSPG/KAG/releases/latest
+      finding: release probe returned HTTP 200 from verified final URL https://api.github.com/repos/OpenSPG/KAG/releases/latest
+    - source_url: https://api.github.com/repos/OpenSPG/KAG/releases/latest
+      finding: parsed pinned official release tag v0.8.0
+    - source_url: https://github.com/OpenSPG/KAG
+      finding: docs probe returned HTTP 200 from verified final URL https://github.com/OpenSPG/KAG
+    - source_url: https://github.com/OpenSPG/KAG
+      finding: 'resources evidence inspection parsed 388758 official documentation
+        bytes; matched terms: ram'
+    - source_url: https://github.com/OpenSPG/KAG
+      finding: 'runtime evidence inspection parsed 388758 official documentation bytes;
+        matched terms: root, uid, user'
+    - source_url: https://github.com/OpenSPG/KAG
+      finding: 'persistence evidence inspection parsed 388758 official documentation
+        bytes; matched terms: data'
+    - source_url: https://github.com/OpenSPG/KAG
+      finding: 'configuration evidence inspection parsed 388758 official documentation
+        bytes; matched terms: environment, password, secret, token'
+    - source_url: https://raw.githubusercontent.com/OpenSPG/KAG/v0.8.0/LICENSE
+      finding: license probe returned HTTP 200 from verified final URL https://raw.githubusercontent.com/OpenSPG/KAG/v0.8.0/LICENSE
+    - source_url: https://raw.githubusercontent.com/OpenSPG/KAG/v0.8.0/docker-compose.yml
+      finding: deployment probe returned HTTP 404
+    - source_url: https://raw.githubusercontent.com/OpenSPG/KAG/v0.8.0/docker-compose.yaml
+      finding: deployment probe returned HTTP 404
+    checked_at: '2026-09-01T03:41:41Z'
