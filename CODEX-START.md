@@ -2,7 +2,7 @@
 
 你现在接手 xmg-kb。
 
-本轮不要先写代码。先重新建立当前 Feature 的可信状态，然后只推进一个 Phase Gate。
+xmg-kb 是独立知识库基础设施，只负责 Ingestion、Governance、Canonical Wiki、RAG、API、MCP 和知识库运维能力。不要进入或修改任何外部业务 Agent 项目，也不要把外部 Agent 状态当作 xmg-kb Gate。
 
 ## 1. 阅读顺序
 
@@ -17,7 +17,7 @@
 7. `docs/development.md`
 8. `docs/testing.md`
 9. `docs/publication-policy.md`
-10. 当前 Feature 相关 ADR
+10. 当前任务相关 ADR
 
 然后检查：
 
@@ -27,15 +27,13 @@ git branch --show-current
 git log --oneline --decorate -20
 ```
 
-## 2. 先判断当前 Gate
+以本地代码、服务、测试和最新 reports 为事实依据，不根据聊天历史猜当前状态。
 
-按照 `docs/roadmap.md` 从前往后检查。
+## 2. 确定 Current Gate
 
-选择：
+按照 `docs/roadmap.md` 从前往后，找到最靠前的、前置条件已满足但尚未 PASS 的 Phase。
 
-> 最靠前的、前置条件已满足但尚未 PASS 的 Phase。
-
-在修改任何代码前先输出：
+修改代码前输出：
 
 ```text
 CURRENT_PHASE:
@@ -46,79 +44,56 @@ BLOCKERS:
 THIS_RUN_GOAL:
 ```
 
-## 3. 一次只推进一个 Gate
+一次只推进一个 Gate。达到 `PASS` 或 `BLOCKED` 后停止，不顺便推进后续 Phase。
 
-本轮目标是：
-
-```text
-当前 Gate
-→ 设计
-→ 实现
-→ 测试
-→ 验收
-→ PASS / BLOCKED
-```
-
-达到 PASS 后停止，不顺便推进下一 Phase。
-
-## 4. 不重复造轮子
-
-优先检查当前实现：
-
-```bash
-find .
-rg -n "<相关关键词>"
-git log -- <相关路径>
-```
-
-发现已有 Adapter / Flow / Policy / Test：
-
-优先复用、补齐、修复和验证。
-
-禁止创建平行第二套实现。
-
-## 5. 架构不可突破
-
-生产主链保持：
+## 3. 当前架构边界
 
 ```text
 Evidence
-→ Prefect
+→ Prefect Ingestion
 → Docling Serve / MinerU
 → Document Governance
-→ Knowledge Engineering
-→ Outline 90-Review
-→ Outline Canonical Collections
-→ RAGFlow Parser / Chunker / Indexer
-→ Hybrid Retrieval / Rerank
-→ AI QA
-→ Langfuse
-→ Knowledge Evolution
+→ Knowledge Governance
+→ BookStack Review
+→ BookStack Canonical
+→ RAGFlow
+→ Knowledge / Retrieval API
+→ MCP
+→ External Consumers
+```
+
+Langfuse 是 Observability/Evaluation；KAG/OpenSPG 是 Optional POC。
+
+外部消费者不属于 xmg-kb：不要实现聊天机器人、工单、钉钉、Multi-Agent、业务 Agent Runtime。
+
+## 4. 不重复造轮子
+
+修改前先使用 `find`、`rg`、`git log -- <path>` 检查现有 Adapter / Flow / Policy / Test / Deploy。
+
+已有能力优先复用、修复、补测试和验证；禁止创建平行第二套 Parser、Flow、State、Wiki/RAG Adapter。
+
+## 5. 历史资产处理
+
+提前存在的 Manifest、Mapping、Parsed、Provenance 等资产，不因当前 Phase 尚未通过而删除或重做。
+
+统一按 `PRE_EXISTING_REUSABLE_ASSET` 处理，后续 Gate 逐项重新验收。
+
+遵循：
+
+```text
+Legacy First
+Raw Fallback
 ```
 
 ## 6. 数据与公共仓库安全
 
-本仓库是公开代码库。
+真实运行数据必须在 Git checkout 外。
 
-任何真实运行数据都必须在仓库外。
+不得提交私有技术文档、真实 parsed/normalized/knowledge 数据、数据库、RAG Index、Trace/日志、内部报告、真实部署路径/地址或 Secret。
 
-不得提交：
+测试只使用 synthetic/public fixture。
 
-- 私有技术文档；
-- PDF/Office 源文件；
-- 真实 parsed/normalized 数据；
-- 数据库；
-- RAG 索引；
-- Trace/日志；
-- 内部报告；
-- 真实部署路径/内部地址；
-- Secrets。
-
-所有测试数据必须是 synthetic/public fixture。
-
-提交前严格执行 `docs/publication-policy.md`。
-
-## 7. 代码范围
+## 7. 自研范围
 
 只开发必要的：
 
@@ -126,34 +101,26 @@ Evidence
 - Policy
 - Schema
 - Prompt
-- Flow
-- Mapping
-- Sync
-- MCP safety layer
+- Prefect Flow
+- Mapping / Provenance
+- Wiki/RAG Sync
+- Knowledge / Retrieval API
+- MCP Safety Layer
 - Tests
 
-不要 fork 或重写成熟上游组件。
+不 fork 或重写成熟上游组件。
 
 ## 8. 验收
 
-当前 Phase 的每条 Acceptance 建表：
+当前 Phase 每条 Acceptance 建表：
 
 | Acceptance | Result | Evidence |
 |---|---|---|
 
-强制项全部 PASS 才能标记 Phase PASS。
+强制项全部有新鲜证据才能标记 `PASS`。
 
 ## 9. 最终回复
 
-只输出：
-
-1. Current Gate
-2. Starting State
-3. Changes
-4. Tests
-5. Acceptance
-6. Git commit
-7. Result: PASS/BLOCKED
-8. Next Gate
+只汇报：Current Gate、Starting State、Changes、Tests、Acceptance、Git Commit、Result(PASS/BLOCKED)、Next Gate。
 
 不要粘贴大量日志。
