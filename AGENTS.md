@@ -2,7 +2,22 @@
 
 本文件是 xmg-kb 仓库内 AI Agent / Codex 的最高项目级协作约束。
 
-## 1. 开始任何任务前
+## 1. 项目定位
+
+xmg-kb 是独立知识库基础设施，只负责：
+
+- Ingestion；
+- Document Governance；
+- Knowledge Governance；
+- Canonical Wiki；
+- RAG；
+- Knowledge/Retrieval API；
+- MCP；
+- Knowledge Operations / Backup / Observability。
+
+不负责业务 Agent、聊天机器人、工单、钉钉、自动运维和 Multi-Agent Runtime。任何外部项目都只能作为消费者，不得成为 xmg-kb Phase Gate。
+
+## 2. 开始任何任务前
 
 必须按顺序阅读：
 
@@ -11,39 +26,20 @@
 3. `docs/requirements.md`
 4. `docs/architecture.md`
 5. `docs/roadmap.md`
-6. `docs/development.md`
-7. `docs/testing.md`
-8. `docs/publication-policy.md`
-9. 与当前任务直接相关的 ADR
+6. `docs/component-audit.md`
+7. `docs/development.md`
+8. `docs/testing.md`
+9. `docs/publication-policy.md`
+10. 与当前任务直接相关的 ADR
 
-不要根据聊天历史猜项目状态。
+不要根据聊天历史猜项目状态，以本地代码、运行状态、测试和最新报告为证据。
 
-## 2. 分支治理
+## 3. 分支治理
 
-- `main` 只保存已经审阅、可回退的稳定基线。
-- 每个 Feature 使用独立分支。
-- 禁止直接在 `main` 开发。
-- 推荐命名：`feature/<slug>`、`fix/<slug>`、`docs/<slug>`。
-- 一个 Feature 的设计、实现、测试和文档应尽量绑定在同一分支/PR。
-- 不覆盖其他 Agent 未提交或不属于当前任务的工作。
-
-## 3. 研发流程
-
-复杂任务遵循：
-
-```text
-Inspect
-→ Requirements
-→ Design
-→ Plan
-→ Tests
-→ Implementation
-→ Verification
-→ Report
-→ Commit / PR
-```
-
-禁止先大规模实现、最后统一补测试。
+- `main` 保存稳定公开基线；
+- Feature 使用独立分支；
+- 不覆盖其他 Agent 未提交工作；
+- 修改前检查 `git status`、当前 branch 和最近 commit。
 
 ## 4. Phase Gate
 
@@ -51,9 +47,7 @@ Inspect
 
 只能推进：
 
-> 最靠前的、其 Prerequisites 已满足但尚未 PASS 的 Phase。
-
-不得因为后续目录、代码或容器已经存在就跳过前置 Gate。
+> 最靠前的、Prerequisites 已满足但尚未 PASS 的 Phase。
 
 状态只允许：
 
@@ -64,33 +58,24 @@ Inspect
 - `BLOCKED`
 - `DEVIATED`
 
-`PASS` 必须有命令、测试、API、运行状态或数据指标等可验证证据。
+已有后续资产允许标记为 `PRE_EXISTING_REUSABLE_ASSET`，优先复用；`DEVIATED` 不等于推倒重做。
 
-## 5. 成熟组件优先
+`PASS` 必须有命令、测试、API、运行状态或数据指标等新鲜证据。
 
-默认主链：
+## 5. 默认主链
 
-- Outline
+- BookStack
 - Prefect
 - Docling Serve
 - MinerU fallback
+- LibreOffice
+- ClamAV
 - RAGFlow
 - Langfuse
 - Simple Curator
-- KAG/OpenSPG POC
+- KAG/OpenSPG POC（可选）
 
-禁止无充分证据自研：
-
-- Wiki / Rich Editor
-- PDF/OCR/Layout Engine
-- Workflow Runtime
-- Vector DB
-- Chunk Engine
-- Search Engine
-- Trace/Eval Platform
-- 通用 MCP 协议框架
-
-自研范围应集中在：
+核心自研范围：
 
 - Adapter
 - Schema
@@ -99,120 +84,80 @@ Inspect
 - Prefect Flow
 - Mapping / Provenance
 - Wiki/RAG Sync
-- 安全 MCP Tools
+- Knowledge / Retrieval API
+- MCP Safety Layer
 - Acceptance Tests
 
-## 6. 数据边界
+禁止无充分证据自研 Wiki、OCR/PDF Layout、Workflow Runtime、Vector DB、Chunk Engine、Search Engine、Trace/Eval Platform 或通用 MCP Runtime。
 
-公共 Git 仓库永远只保存代码和公开设计。
+## 6. Source of Truth
 
-任何真实知识库内容、生产数据、数据库、日志、Trace、内部报告、真实路径、内部 URL、密钥均不得提交。
+```text
+Evidence
+→ Governance
+→ Review
+→ BookStack Canonical Wiki
+→ RAGFlow Derived Index
+→ API / MCP
+```
 
-所有示例路径使用：
+BookStack Canonical 是人类可维护的权威知识层；RAGFlow 是可重建派生索引。
+
+禁止：
+
+- Raw / Legacy / Review → Production RAG；
+- RAG Chunk 反向覆盖 Canonical；
+- 两套 Canonical Master 并行维护。
+
+## 7. Knowledge Unit != RAG Chunk
+
+```text
+Knowledge Unit = 治理单位
+RAG Chunk      = 检索单位
+```
+
+不得混用。
+
+## 8. Adapter / Harness 原则
+
+核心逻辑依赖稳定接口，而不是具体组件内部实现：
+
+```text
+SourceAdapter
+ParserAdapter
+WikiAdapter
+RagAdapter
+ObservabilityAdapter
+```
+
+新增/替换能力优先通过 Adapter / Registry 完成。
+
+## 9. AI 知识权限
+
+默认允许：Search、Read、Source Lookup、Create Review、Patch Review、Comment、RAG Search/Context。
+
+默认禁止：Delete Canonical、绕过 Review、静默改写关键技术参数、静默解决版本/冲突、直接操作 Wiki 数据库。
+
+## 10. 数据与公共仓库边界
+
+公共 Git 只保存代码和公开设计。
+
+禁止提交真实知识库内容、生产数据、数据库、索引、日志、Trace、内部报告、真实路径、内部 URL、Secrets。
+
+示例统一使用：
 
 ```text
 /srv/xmg-kb
-/srv/xmg-kb/evidence
-```
-
-所有示例 URL 使用：
-
-```text
 https://wiki.example.invalid
 https://rag.example.invalid
 ```
 
 详见 `docs/publication-policy.md`。
 
-## 7. Source of Truth
+## 11. 测试与完成声明
 
-架构层面：
+新功能至少具备 Unit Test；关键 Adapter 具备 Integration Test；关键路径具备 Smoke/E2E Test。
 
-```text
-Evidence
-→ Governance
-→ Review
-→ Canonical Wiki
-→ Derived RAG Index
-```
+禁止用“应该完成”“理论可用”代替验收。如果无法验证，状态必须是 `IMPLEMENTED_UNVERIFIED` 或 `BLOCKED`。
 
-Outline Canonical Collections 是人类可维护的权威知识层。
-
-RAGFlow 是派生索引，不是事实源。
-
-禁止：
-
-- Raw → Production RAG
-- Review → Production RAG
-- RAG Chunk 反向覆盖 Canonical
-- 两套 Canonical Master 并行维护
-
-## 8. Knowledge Unit != RAG Chunk
-
-永远区分：
-
-```text
-Knowledge Unit
-= 治理单位
-= 去重 / 版本 / 冲突 / Canonical
-
-RAG Chunk
-= 检索单位
-= Retrieval Context
-```
-
-## 9. AI Wiki 权限
-
-AI 默认允许：
-
-- Search
-- Read
-- Create Review
-- Patch Review
-- Comment
-- Source Lookup
-
-AI 默认禁止：
-
-- Delete Canonical
-- 绕过 Review
-- 静默改写关键技术参数
-- 静默解决版本/冲突
-
-## 10. 测试
-
-新功能至少具备：
-
-- Unit Test；
-- 关键 Adapter 的 Integration Test；
-- 关键端到端路径的 Smoke/E2E Test。
-
-所有测试只使用合成数据或公开 fixture。
-
-不得为了测试拉入真实内部文档。
-
-## 11. Git 提交
-
-- 每个可独立验收的变更使用语义清晰 Commit。
-- 提交前执行 `git diff --check`。
-- 检查 `git status --short`。
-- 运行当前范围测试。
-- 运行公共仓库安全检查。
-- 禁止提交 `.env`、数据库、运行数据、二进制私有文档。
-
-## 12. 完成声明
-
-禁止使用：
-
-- “应该完成”
-- “理论可用”
-- “大概率正常”
-
-只能依据证据报告：
-
-- `PASS`
-- `BLOCKED`
-
-如果无法验证，状态是：
-
-`IMPLEMENTED_UNVERIFIED`。
+提交前执行当前范围测试、`git diff --check`、`git status --short` 和公共仓库安全检查。
