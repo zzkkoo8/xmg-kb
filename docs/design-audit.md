@@ -1,177 +1,96 @@
 # 历史设计审计与最终收敛
 
-本文用于解释 xmg-kb 为什么形成当前架构。它只保留可以公开的架构结论，不包含任何真实知识内容、私有目录、运行状态或内部审计数据。
+本文解释 xmg-kb 的架构演进，只保留可公开的设计结论，不包含真实知识内容、私有目录、运行状态或内部审计数据。
 
-## 1. 历史设计演进
+## 1. 历史演进
 
-### v3：从“文档处理”升级为“知识治理”
+### v3：从文档处理升级为知识治理
 
-关键贡献：
+保留：Knowledge Unit、三层去重、Version Scope、Authority、Conflict、Canonical Synthesis、Provenance。
 
-- 明确 Knowledge Unit；
-- 三层去重：Exact File、Near Document、Knowledge-level Semantic；
-- Version Scope；
-- Authority；
-- Conflict != Duplicate；
-- Canonical Synthesis；
-- Provenance；
-- KAG / GraphRAG 等方案评估。
-
-保留结论：
-
-> 文档去重不能解决“同一知识点散落在多份资料”的问题，必须增加知识级治理层。
+核心结论：文档去重不能解决知识级重复与冲突，必须有 Knowledge Governance。
 
 ### v4：形成 Wiki + RAG + Workflow + Feedback 主骨架
 
-关键贡献：
+保留：Human Wiki 与 Production RAG 分层；Prefect 负责任务生命周期；Docling/MinerU 负责解析；RAGFlow 负责检索；Langfuse 负责质量反馈；KAG 仅做 POC。
 
-- Human Wiki 与 Production RAG 分层；
-- Prefect 负责 Workflow；
-- Docling/MinerU 负责解析；
-- RAGFlow 负责正式检索；
-- Langfuse 负责真实使用反馈；
-- KAG 变为可选 Knowledge Engineering POC；
-- Knowledge Evolution Loop。
-
-保留结论：
-
-> 不自研基础设施，使用成熟组件拼接，领域代码只做治理和适配。
+核心结论：成熟组件负责基础设施，xmg-kb 只做领域治理和适配。
 
 ### v5：明确 Review / Canonical 生命周期
 
-关键贡献：
+保留：AI 默认写 Review；Human Approval；Canonical Revision 触发 RAG 增量同步。
 
-- Draft / Review / Canonical 分层；
-- AI 默认写 Review；
-- Human Approval；
-- Wiki 变更触发 RAG 增量同步；
-- Canonical State 与机器状态一致性。
+核心结论：AI 可编辑，但不能绕过审核静默覆盖正式技术事实。
 
-保留结论：
-
-> AI 可以编辑，但不能绕过审核直接覆盖正式技术事实。
-
-### v6：明确 Evidence Pipeline 与 RAG Pipeline 是两件事
-
-关键贡献：
+### v6：明确 Evidence Pipeline 与 RAG Pipeline 分离
 
 ```text
 Evidence Pipeline:
-Raw/Legacy
-→ Parse
-→ Governance
-→ Canonical
+Raw/Legacy → Parse → Governance → Canonical
 
 RAG Pipeline:
-Canonical
-→ Chunk
-→ Index
-→ Retrieve
+Canonical → Chunk → Index → Retrieve
 ```
 
-保留结论：
+核心结论：不能用 Raw 全量切片代替知识治理。
 
-> RAG Chunking 必须发生在 Canonical 之后，不能用“Raw 全量切片”替代知识治理。
+### v7：Execution-Ready Gate
 
-### v7：把架构升级为 Execution-Ready Gate
+保留：Prerequisites、Preflight、Acceptance、Stop Conditions、Rollback、Phase Gate、Legacy Reuse、Source of Truth、Backup/Restore。
 
-关键贡献：
+核心结论：代码/Compose/旧报告存在都不是 PASS，必须有当前实测证据。
 
-- Bootstrap；
-- Prerequisites；
-- Preflight；
-- Acceptance；
-- Stop Conditions；
-- Rollback；
-- Phase Gate；
-- Legacy Reuse；
-- Source of Truth；
-- Backup / Restore。
+## 2. 当前最终产品定位
 
-保留结论：
-
-> “代码存在”“Compose 存在”“旧报告写 PASS”都不是完成证据，必须由实际 Health/Test/API/Data Evidence 验收。
-
-## 2. 历史实施计划审计得到的工程教训
-
-对历史 Phase 计划和进度文档复核后，保留以下通用工程原则。
-
-### 2.1 Gate 不能只写在文档里
-
-必须让：
+xmg-kb 收敛为：
 
 ```text
-Prerequisites
-→ Runtime Evidence
-→ Acceptance
+Knowledge Platform / Knowledge Infrastructure
 ```
 
-真正决定下一 Phase 是否可运行。
-
-### 2.2 旧资产优先复用
-
-如果已有高质量解析/整理成果：
+只负责：
 
 ```text
-Reuse
+Ingestion
+Document Governance
+Knowledge Governance
+Canonical Wiki
+RAG
+Knowledge / Retrieval API
+MCP
+Operations / Observability / Backup
 ```
 
-优先于：
+不负责：业务 Agent、聊天机器人、工单、IM Bot、自动运维、Multi-Agent Runtime。
 
-```text
-Reparse / Re-LLM
-```
+外部项目只作为 API/MCP/RAG 消费者，不进入 xmg-kb Phase Gate。
 
-但复用必须保留 Source Mapping 和 Provenance。
+## 3. Human Wiki 决策收敛
 
-### 2.3 旧实现不自动等于最终架构 PASS
+早期方案使用 Outline 作为默认 Wiki。
 
-历史代码或数据可以：
+在“开源优先、稳定 REST API、人类可维护、AI 可受控读写、易自托管和易分发”的当前约束下，默认基线调整为 BookStack。
 
-- Reuse；
-- Adapt；
-- Migrate；
+架构层面通过 `WikiAdapter` 隔离 Wiki 实现，避免核心治理模型绑定某个产品。
 
-但如果产生于最终 Gate 之前，只能算“已有资产”，不能直接跳过最终验收。
+Outline 作为可选替代，不再是默认 Required Component。
 
-### 2.4 Runtime 与公共代码必须彻底分离
-
-真实 Knowledge、State、Logs、Trace、Database、Report 均应在 Git checkout 外运行。
-
-公共仓库只保存：Code、Public Docs、Config Template、Synthetic Fixture。
-
-## 3. 最终架构调整：Human Wiki
-
-早期方案默认 Outline。
-
-v7 以“成熟 + 自托管 + 稳定 API/MCP + AI 可读写 + 人类编辑体验”审计后，当前基线保持 Outline：
-
-- Collections / Nested Documents；
-- API / MCP；
-- 协作编辑；
-- History；
-- Attachment；
-- Permission；
-- Webhook；
-- Import/Export。
-
-Outline 的 BSL 1.1 属于 source-available 而不是严格 OSI 开源；v7 将其作为透明记录的许可证例外。若未来强制 100% OSI，必须通过新 ADR、数据迁移和完整验收后再替换，不能在当前主链混用两个 Wiki。
-
-## 4. 最终不变的核心原则
+## 4. 最终不变的原则
 
 ```text
 Evidence != Canonical
 Knowledge Unit != RAG Chunk
 Canonical Wiki != RAG Index
 AI Draft != Approved Knowledge
+External Consumer != xmg-kb Runtime
 Deployment != Verified
 Code Exists != PASS
 ```
 
-## 5. 当前公共架构基线
+## 5. 当前组件基线
 
 ```text
-Outline
+BookStack
 +
 Prefect
 +
@@ -179,40 +98,34 @@ Docling Serve
 +
 MinerU fallback
 +
+LibreOffice / ClamAV
++
 RAGFlow
 +
 Langfuse
 +
 Simple Curator
 +
-KAG POC
+KAG POC (optional)
 ```
 
-自定义代码只做：
+自定义代码只做 Adapter、Schema、Policy、Prompt、Flow、Mapping、Sync、API、MCP Safety Layer 和 Tests。
+
+## 6. 历史资产处理原则
+
+提前存在的 Manifest、Mapping、Parsed、Provenance 等资产属于 `PRE_EXISTING_REUSABLE_ASSET`。
+
+它们需要按当前 Gate 重新验收，但不因阶段顺序偏差自动删除、重跑或重新调用昂贵模型。
+
+原则：
 
 ```text
-Adapter
-Schema
-Policy
-Prompt
-Flow
-Mapping
-Sync
-MCP Safety Layer
-Test
+Legacy First
+Raw Fallback
 ```
 
-## 6. 何时允许改变基线
+## 7. 核心组件替换规则
 
-任何替换核心组件的提议都必须新增 ADR，并至少回答：
+任何替换核心组件的提议都必须有 ADR，并至少说明：当前组件的实测缺口、新组件成熟度、License、API 稳定性、迁移成本、Data Portability、Benchmark 和 Rollback。
 
-1. 当前组件哪里实测不满足需求；
-2. 新组件是否更成熟；
-3. License 是否更适合；
-4. API 是否稳定；
-5. 迁移成本；
-6. Data Portability；
-7. Benchmark；
-8. Rollback。
-
-没有这些证据，不允许因“更流行”或“感觉更先进”替换主链。
+没有证据，不因为“更流行”或“更新”替换主链。
