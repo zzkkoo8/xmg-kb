@@ -12,7 +12,7 @@ ADR-XXXX-short-title.md
 
 当前：
 
-- [ADR-0001：Canonical Wiki 与 RAG Index 分离](ADR-0001-canonical-vs-rag.md) — Accepted
+- [ADR-0001：Canonical 文件与 RAG 派生索引分离](ADR-0001-canonical-vs-rag.md) — Accepted
 - [ADR-0002：旧版默认组件基线（Outline）](ADR-0002-open-source-stack.md) — Superseded
 - [ADR-0003：知识平台边界与 BookStack 默认 Wiki](ADR-0003-knowledge-platform-scope-and-bookstack.md) — Superseded
 
