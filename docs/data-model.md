@@ -115,7 +115,7 @@ updated_at
 ## CanonicalSource
 
 ```text
-canonical_id
+knowledge_id
 source_document_id
 source_section_id
 knowledge_unit_id
@@ -198,5 +198,5 @@ created_at
 
 - 未知值必须显式为 unknown/null，不允许模型编造；
 - Canonical 必须至少追溯至 Source Document；
-- Production Chunk 必须追溯至 Canonical Page + Revision；
-- 同一 Canonical 的新旧 Revision 不应同时 Active。
+- Production Chunk 必须追溯至 Canonical File + Content Hash；
+- 同一知识项的旧新索引版本不应同时 Active。
