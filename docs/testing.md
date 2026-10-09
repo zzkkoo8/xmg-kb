@@ -16,7 +16,7 @@
 
 覆盖：
 
-- Outline API/MCP；
+- File API/MCP；
 - Docling Serve；
 - RAGFlow；
 - Langfuse；
