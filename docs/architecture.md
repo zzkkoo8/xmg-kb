@@ -2,159 +2,83 @@
 
 ## 1. 架构目标
 
-xmg-kb 是知识库基础设施，不是业务 Agent 平台。
+xmg-kb 是文件型企业知识库生产与治理基础设施，不是业务 Agent 平台，也不在当前阶段建设 Wiki UI。
 
-它负责把异构 Evidence 转化为：
+核心原则：
 
-1. 人类长期维护的 Canonical Wiki；
-2. 面向 AI/应用的高质量 RAG Index；
-3. 稳定的 Knowledge API / Retrieval API / MCP。
+- **文件系统是 Canonical Knowledge**：Markdown、HTML、图片、视频、PDF 和其他附件真实存储在本地知识目录。
+- **应用必须操作原文件**：未来展示/编辑层须原生读写这些文件，不得把 Wiki 数据库作为第二份知识事实源。
+- **GitLab 是后续同步/备份目标**：不是当前运行依赖，也不是知识本体。
+- **RAG 是派生索引**：可以删除重建，不能成为唯一内容来源。
+- **原始 Evidence 不可变**：处理结果写入独立工作区和知识目录，保留来源链路。
 
-系统永久分离：
-
-```text
-Evidence
-Canonical Knowledge
-RAG Chunks
-External Consumers
-```
-
-外部 Agent、聊天机器人和业务系统只消费接口，不进入 xmg-kb 内部生命周期。
-
-## 2. 七层架构
+## 2. 文件型知识库生产管线
 
 ```text
-┌──────────────────────────────────────┐
-│ 7. Interface                         │
-│ REST API / MCP                       │
-├──────────────────────────────────────┤
-│ 6. Retrieval                         │
-│ RAGFlow / Hybrid / Rerank            │
-├──────────────────────────────────────┤
-│ 5. Canonical Knowledge               │
-│ BookStack / Review / History         │
-├──────────────────────────────────────┤
-│ 4. Knowledge Governance              │
-│ KU / Version / Conflict / Canonical  │
-├──────────────────────────────────────┤
-│ 3. Document Governance               │
-│ Dedup / Metadata / Taxonomy          │
-├──────────────────────────────────────┤
-│ 2. Ingestion                         │
-│ Prefect / Docling Serve / MinerU     │
-├──────────────────────────────────────┤
-│ 1. Evidence                          │
-│ Raw / Legacy / External Sources      │
-└──────────────────────────────────────┘
+Sources: local folders / network / web / API / Office / PDF / images / human / agents
+                                  ↓
+                        Source Adapter + Manifest
+                                  ↓
+                 Inventory / Hash / Reuse / Dedup
+                                  ↓
+                     Parser Adapter + Fallback
+                                  ↓
+                   Normalize: Markdown + Assets
+                                  ↓
+           Knowledge Build: Classify / Split / Merge / Link
+                                  ↓
+                   Local File Knowledge Store
+                                  ↓
+             Directory / Quality / Provenance Governance
+                                  ↓
+                         Knowledge API / MCP
+                                  ↓
+                         RAGFlow Derived Index
+                                  ↓
+                         External Agents
+                                  ↓
+                    Feedback / Evidence / Proposal
+                                  └────────→ Knowledge Build
 ```
 
-横向公共能力：
+## 3. 本地知识目录边界
+
+运行目录与代码仓库分离，通过配置指定实际路径。公开示例：
 
 ```text
-State
-Provenance
-Security
-Audit
-Observability
-Backup / Restore
-Config
-Adapter Registry
+/srv/xmg-kb/
+├── sources/       # 来源清单和只读引用
+├── work/          # 临时解析和转换结果，可重建
+├── knowledge/     # Canonical Markdown/HTML/assets
+├── metadata/      # provenance、hash、分类、质量与变更映射
+├── state/         # checkpoint、任务状态、重试状态
+├── quarantine/    # 失败、损坏或待人工处理内容
+└── logs/          # 运行日志
 ```
 
-## 3. 总体数据流
+## 4. 文件与元数据模型
 
-```text
-Evidence Sources
-  ├─ Markdown / HTML
-  ├─ PDF / Image
-  ├─ DOCX / PPTX / XLSX
-  └─ Historical Curated Knowledge
-          ↓
-Source Registry / Manifest
-          ↓
-Prefect
-  ├─ Retry
-  ├─ Cache
-  ├─ Resume
-  ├─ Schedule
-  └─ Concurrency
-          ↓
-Document Parsing
-  ├─ Docling Serve
-  └─ MinerU fallback
-          ↓
-Normalized Evidence
-  ├─ Structured Data
-  ├─ Markdown
-  ├─ Assets
-  └─ Provenance
-          ↓
-Document Governance
-  ├─ Exact Dedup
-  ├─ Near-document Dedup
-  ├─ Metadata / Taxonomy / Alias
-  ├─ Version
-  ├─ Authority
-  └─ Security Classification
-          ↓
-Knowledge Governance
-  ├─ Section
-  ├─ Knowledge Unit
-  ├─ Relation
-  ├─ Conflict
-  └─ Canonicalization
-          ↓
-BookStack Review
-          ↓
-Human Approval
-          ↓
-BookStack Canonical Wiki
-        ├──────────────────────────────┐
-        ↓                              ↓
-Knowledge API / MCP          Canonical-only Sync
-                                       ↓
-                                    RAGFlow
-                              ├─ Parser
-                              ├─ Chunker
-                              ├─ Transformer（可选）
-                              └─ Indexer
-                                       ↓
-                         Metadata / Hybrid / Rerank
-                                       ↓
-                                Retrieval API / MCP
-                                       ↓
-                             External Applications
-```
+Markdown 是主要结构化知识格式；必要时保留 HTML；图片、图表、视频、音频和附件以独立文件保存。来源、hash、解析器版本、置信度、权限、版本范围等元数据与正文分离。每份 Canonical Knowledge 必须追溯到来源；移动或重命名文件时检查内部链接和资产引用。Knowledge Unit 用于治理，RAG Chunk 用于检索，两者不能混用。
 
-Langfuse 横向记录 Retrieval/QA Trace、Feedback 和 Evaluation；Knowledge Evolution 只产生 Review Proposal，不直接覆盖 Canonical。
+## 5. 目录治理
 
-## 4. Human Wiki：BookStack
+目录树是持续治理对象。系统识别重复/重叠目录、孤儿文件、过深层级、主题混杂、断链和命名不一致，并生成变更提案。目录迁移必须 dry-run、链接检查、差异预览、审计和回滚；高影响变更需人工批准。
 
-BookStack 是当前默认 Canonical Wiki 实现。
+## 6. Agent 反馈闭环
 
-选择目标：
+外部 Agent 可提交使用信号、缺失问题、新证据和建议修订。反馈先形成带来源、任务 ID、证据、影响范围和置信度的 Proposal，再按策略进入自动低风险修订、人工审核或隔离队列。聊天回答本身不能自动视为事实证据。
 
-- Self-hosted；
-- 人类直接 Web 阅读与编辑；
-- WYSIWYG/Markdown 能力；
-- 层级、搜索、附件、历史、权限；
-- REST API；
-- Webhook/事件能力；
-- Backup/Restore；
-- 运行维护简单。
+## 7. 当前组件边界
 
-架构上不允许业务逻辑直接依赖 BookStack 数据库。统一通过：
+- Prefect：任务生命周期、重试、恢复和并发。
+- Docling Serve：默认解析器；MinerU/OCR/LibreOffice 按格式与质量触发。
+- 本地文件系统：唯一 Canonical Knowledge Store。
+- RAGFlow：派生索引与检索。
+- xmg-kb API/MCP：受控读取、来源查询、提案和反馈。
+- GitLab：未来双向同步/备份适配器，当前不部署、不构成依赖。
+- Wiki UI：暂缓；未来候选必须直接操作本地文件，并通过 POC 验证。
 
-```text
-WikiAdapter
-    └─ BookStackAdapter
-```
-
-未来替换 Wiki 只能新增 Adapter/ADR，不修改知识治理核心模型。
-
-AI 默认通过 xmg-kb API/MCP 操作 Review 内容，不直接绕过审核修改关键 Canonical 技术事实。
-
-## 5. Workflow：Prefect
+## 8. Workflow：Prefect
 
 Prefect 只负责确定性的 Task Lifecycle：
 
