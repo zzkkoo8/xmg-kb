@@ -17,3 +17,4 @@ ADR-XXXX-short-title.md
 - [ADR-0003：知识平台边界与 BookStack 默认 Wiki](ADR-0003-knowledge-platform-scope-and-bookstack.md) — Accepted
 
 当前实现应以最新 Accepted ADR 为准；被 Superseded 的 ADR 仅作为历史设计记录。
+- [ADR-0004：文件型知识库作为唯一 Canonical Store](ADR-0004-file-knowledge-store.md) — Accepted
