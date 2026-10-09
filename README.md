@@ -91,10 +91,10 @@ xmg-kb 最终至少提供三类稳定能力：
 
 ```text
 Knowledge API
-- search/read canonical knowledge
+- search/read canonical files
 - source/provenance lookup
-- create/patch review
-- comment/history
+- submit feedback / knowledge proposal
+- controlled patch/history
 
 Retrieval API
 - search/retrieve/context
