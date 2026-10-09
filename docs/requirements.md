@@ -6,7 +6,7 @@ xmg-kb 是独立的知识库基础设施 / Knowledge Platform，只负责知识�
 
 1. **Ingestion**：知识入库、解析、标准化与可恢复处理；
 2. **Governance**：去重、元数据、版本、权威性、冲突、Knowledge Unit 与 Canonicalization；
-3. **Human Wiki**：人类可读、可编辑、可审核、可维护的 Canonical Wiki；
+3. **File Knowledge Store**：本地文件系统中的 Canonical Markdown/HTML/多媒体与元数据；
 4. **RAG**：Canonical-only 的高质量索引、检索、重排与引用；
 5. **API / MCP**：向外部应用和 AI Agent 提供稳定、受控的知识接口；
 6. **Operations**：状态、审计、质量评估、备份恢复与可观测性。
@@ -19,33 +19,34 @@ xmg-kb 不承担具体业务 Agent、聊天机器人、工单、钉钉、自动�
 
 所有 Evidence 必须保留 Source ID、Hash、Provenance 和处理状态；源数据默认不可被 Pipeline 原地修改。
 
-## 3. Human Wiki
+## 3. 文件型知识库
+
+文件系统是唯一 Canonical Knowledge Store。所有知识正文和多媒体资产必须以真实文件保存在本地；当前阶段不要求 Wiki UI。
 
 必须满足：
 
-- 浏览器访问；
-- WYSIWYG 和/或 Markdown 编辑；
-- 清晰层级与搜索；
-- Tags / Attachments / Comments；
-- Page History；
-- Permission；
-- Import / Export；
-- 稳定 REST API；
-- Webhook 或等价事件机制；
-- Backup / Restore。
+- Markdown 为主要结构化知识格式；根据需要保留 HTML、图片、视频、PDF、Office 和其他附件原文件；
+- 多来源 Source ID、SHA-256、Provenance、MIME、时间和处理状态可追溯；
+- 原始 Evidence 只读，解析/清洗结果写入独立工作区；
+- 解析产物、Canonical 文件、元数据、任务状态和隔离区分离；
+- 图片/附件链接可离线解析，移动文件时检查链接；
+- 文件变更可审计、可比较、可回滚；
+- 本地文件可被其他程序原生读取/编辑；
+- RAG 索引可以从 Canonical 文件重建；
+- GitLab 同步/备份是后续能力，不是当前依赖。
 
-当前默认实现为 BookStack，但上层通过 `WikiAdapter` 解耦，不允许业务逻辑直接依赖 Wiki 数据库。
+当前不以 Outline、BookStack 或 Wiki.js 的内置数据库作为知识事实源。
 
 ## 4. AI Knowledge Management
 
 AI 通过 API/MCP 必须能够：
 
-- Search Canonical；
-- Read Full Page；
+- Search Canonical Files；
+- Read File / Asset；
 - Read Source / Provenance；
-- Create Review；
-- Patch Review；
-- Comment；
+- Submit Feedback；
+- Create Knowledge Proposal；
+- Request controlled patch;
 - 提出分类、目录和合并建议。
 
 默认禁止：
@@ -54,7 +55,7 @@ AI 通过 API/MCP 必须能够：
 - 绕过 Review；
 - 无证据改变关键参数；
 - 静默解决版本或冲突；
-- 直接操作 Wiki 数据库。
+- 任意路径写入或直接绕过治理修改 Canonical 文件。
 
 ## 5. 海量入库管线
 
@@ -103,21 +104,7 @@ AI 通过 API/MCP 必须能够：
 
 ## 8. RAG
 
-Production RAG 必须：
-
-- 只来源于 Canonical Wiki；
-- Raw / Legacy / Review / Normalized 不进入 Production Dataset；
-- 有正式 Chunking；
-- Chunk 可追溯至 Canonical ID + Wiki Page + Revision；
-- Metadata Filter；
-- Full-text；
-- Vector；
-- Hybrid；
-- Rerank；
-- Incremental Update；
-- Revision Atomic Switch；
-- Citation；
-- Gold QA Benchmark。
+Production RAG 必须从通过质量门禁的 Canonical 文件构建；Raw、Legacy、Review 和临时解析结果不得直接混入正式索引。Chunk 必须追溯到文件路径/稳定 ID、内容 hash、来源和知识版本。支持 metadata filter、full-text、vector、hybrid、rerank、增量更新和版本原子切换；新版本失败时保留上一有效版本。
 
 ## 9. 对外 API
 
@@ -138,7 +125,7 @@ Production RAG 必须：
 - Context；
 - Metadata Filter；
 - Citation；
-- Canonical/Page/Revision Traceability。
+- File/Hash/Source Traceability。
 
 接口必须与具体外部业务 Agent 解耦。
 

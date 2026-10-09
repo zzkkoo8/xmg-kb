@@ -8,7 +8,6 @@ xmg-kb 不把所有上游产品重做成一个巨型自定义 Compose。优先�
 
 ```text
 deploy/
-├── bookstack/
 ├── prefect/
 ├── docling-serve/
 ├── mineru/
@@ -80,7 +79,6 @@ restore
 
 ### Core
 
-- BookStack；
 - Prefect；
 - xmg-kb API / MCP。
 
@@ -114,16 +112,16 @@ xmg-kb API
 xmg-kb MCP
 ```
 
-不要让业务应用直接依赖 BookStack DB、RAGFlow DB、Prefect DB 或内部容器网络。
+不要让业务应用直接依赖 Canonical 文件目录、RAGFlow DB、Prefect DB 或内部容器网络。
 
-BookStack / RAGFlow 官方 API 由 Adapter 层封装，便于未来替换和权限控制。
+Canonical 文件通过 FileStore/File API 访问；RAGFlow 通过 RagAdapter 访问。
 
 ## 6. 安全
 
 - 数据库不公网暴露；
 - Reverse Proxy 统一 TLS；
 - 不共享 Admin Token；
-- Wiki/API/MCP Token 使用最小权限；
+- API/MCP Token 使用最小权限；
 - Runtime Secret 通过 `.env`/secret store 注入；
 - `.env` 不进入 Git；
 - 默认关闭匿名写入；
@@ -144,17 +142,16 @@ Langfuse/KAG 等非当前主链阶段组件按 roadmap 定义是否阻塞当前 
 
 ## 8. Backup / Restore
 
-必须分别定义：
+当前需要备份并验证恢复：
 
-- BookStack DB + Attachments；
-- Prefect DB；
-- RAGFlow Storage；
-- xmg-kb State / Mapping；
-- Langfuse Storage（启用后）；
+- Canonical Knowledge 文件与多媒体 assets；
+- metadata / provenance / mapping；
+- Prefect 状态与配置；
+- RAGFlow 派生索引（可重建，但可按恢复时间要求选择备份）；
 - Config / Secrets；
-- Canonical Export。
+- state / checkpoint。
 
-备份只有实际 Restore Drill 成功后才算有效。
+文件知识库必须可在不依赖 Wiki 数据库的情况下恢复。备份只有实际 Restore Drill 成功后才算有效。GitLab 同步属于后续阶段，不是当前备份唯一手段。
 
 ## 9. 分发
 

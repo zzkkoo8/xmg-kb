@@ -34,7 +34,7 @@ mypy/pyright（按项目最终选择）
 
 Adapter 只封装上游稳定接口：
 
-- Outline；
+- Local File Knowledge Store / File API；
 - Prefect；
 - Docling Serve；
 - MinerU；
@@ -67,7 +67,7 @@ Prefect Flow 负责编排：
 - Parse；
 - Document Governance；
 - Knowledge Engineering；
-- Wiki Sync；
+- File Governance / Knowledge Proposal；
 - RAG Sync；
 - QA Regression；
 - Evolution；

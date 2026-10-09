@@ -95,25 +95,27 @@ status
 resolution
 ```
 
-## CanonicalArticle
+## CanonicalFile
 
 ```text
-canonical_id
-wiki_page_id
-wiki_revision
-title
-vendor
-product
-topic
+knowledge_id
+relative_path
+format
+content_sha256
+asset_refs
+source_ids
+taxonomy
 version_scope
 review_status
-content_sha256
+confidence
+created_at
+updated_at
 ```
 
 ## CanonicalSource
 
 ```text
-canonical_id
+knowledge_id
 source_document_id
 source_section_id
 knowledge_unit_id
@@ -123,14 +125,60 @@ relation
 ## RagMapping
 
 ```text
-canonical_id
-wiki_page_id
-wiki_revision
-rag_document_id
+knowledge_id
+relative_path
 content_sha256
+rag_document_id
+index_revision
 sync_status
 active
 last_sync_at
+```
+
+## FileAsset
+
+```text
+asset_id
+relative_path
+mime
+content_sha256
+size
+referenced_by
+source_ids
+```
+
+## KnowledgeChange
+
+```text
+change_id
+knowledge_id
+action
+before_hash
+after_hash
+reason
+evidence_refs
+actor
+risk
+review_status
+rollback_ref
+created_at
+```
+
+## AgentFeedback
+
+```text
+feedback_id
+source_agent
+task_ref
+knowledge_refs
+signal_type
+evidence_refs
+observed_problem
+proposal
+confidence
+risk
+status
+created_at
 ```
 
 ## EvolutionEvent
@@ -150,5 +198,5 @@ created_at
 
 - 未知值必须显式为 unknown/null，不允许模型编造；
 - Canonical 必须至少追溯至 Source Document；
-- Production Chunk 必须追溯至 Canonical Page + Revision；
-- 同一 Canonical 的新旧 Revision 不应同时 Active。
+- Production Chunk 必须追溯至 Canonical File + Content Hash；
+- 同一知识项的旧新索引版本不应同时 Active。

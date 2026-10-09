@@ -4,7 +4,7 @@ xmg-kb 是一套面向企业技术资料的**知识库基础设施 / Knowledge P
 
 - 高质量知识入库管线；
 - 文档与知识治理；
-- 人类可读、可编辑的 Canonical Wiki；
+- 本地文件型 Canonical Knowledge Store；
 - 高质量 RAG 索引与检索；
 - 面向外部应用的 Knowledge API / Retrieval API；
 - 面向 AI Agent 的受控 MCP 接口；
@@ -14,50 +14,41 @@ xmg-kb **不负责具体业务 Agent、聊天机器人、工单、钉钉、运�
 
 ## 核心架构
 
+当前阶段聚焦文件型知识库生产管线，暂缓 Wiki 展示/编辑层。知识文件及多媒体资产在本地文件系统中保存，文件是唯一 Canonical Knowledge；数据库、RAG 索引和 GitLab 都不是知识本体。
+
 ```text
-Evidence / Legacy Sources
-          ↓
-Source Registry / Manifest
-          ↓
-Prefect Ingestion Pipeline
-          ↓
-Docling Serve ──→ MinerU fallback
-          ↓
-Normalize / Provenance / Quality Gate
-          ↓
-Document Governance
-Dedup / Metadata / Taxonomy / Version / Authority
-          ↓
-Knowledge Governance
-Knowledge Unit / Relation / Conflict / Canonicalization
-          ↓
-BookStack Review
-          ↓
-Human Approval
-          ↓
-BookStack Canonical Wiki
-          ↓
-Canonical-only Incremental Sync
-          ↓
-RAGFlow Parser → Chunker → Indexer
-          ↓
-Metadata Filter → Hybrid Retrieval → Rerank
-          ↓
-┌────────────────────┬────────────────────┐
-│ Knowledge / RAG API│ MCP                │
-└────────────────────┴────────────────────┘
-          ↓
-External Applications / AI Agents
+多来源 Evidence / Legacy / Agent Feedback
+                  ↓
+         Source Registry / Manifest
+                  ↓
+          Prefect Ingestion Pipeline
+                  ↓
+    Docling Serve → MinerU / OCR fallback
+                  ↓
+      Normalize → Markdown + Assets + Metadata
+                  ↓
+  Knowledge Build / Dedup / Taxonomy / Relations
+                  ↓
+      Local File Knowledge Store (Canonical)
+                  ↓
+  Directory Governance / Quality / Provenance
+                  ↓
+       Knowledge API / File API / MCP
+                  ↓
+       External Agents / RAGFlow Index
+                  ↓
+       Usage Feedback → Review Proposal
+                  └────────→ Knowledge Build
 ```
 
-Langfuse 用于检索与回答质量观测、反馈和评估；KAG/OpenSPG 仅作为 Knowledge Engineering POC，不作为主链硬依赖。
+GitLab 暂不进入当前实现；未来只作为文件双向同步、版本控制和备份目标。Wiki 展示/编辑层暂缓，后续必须原生读写知识原文件，不得建立第二份 Canonical 副本。
 
 ## 七层能力模型
 
 ```text
 7. Interface            REST API / MCP
 6. Retrieval            RAGFlow / Hybrid / Rerank
-5. Canonical Knowledge  BookStack / Review / History
+5. Canonical Knowledge  Local Files / Markdown / Assets / Metadata
 4. Knowledge Governance KU / Version / Conflict / Canonicalization
 3. Document Governance  Dedup / Metadata / Taxonomy / Provenance
 2. Ingestion            Prefect / Docling Serve / MinerU
@@ -70,7 +61,7 @@ Langfuse 用于检索与回答质量观测、反馈和评估；KAG/OpenSPG 仅�
 
 - **Evidence != Canonical**：原始资料不是正式知识。
 - **Knowledge Unit != RAG Chunk**：前者用于治理，后者用于检索。
-- **Canonical Wiki != RAG Index**：Wiki 是权威知识层，RAG 是可重建派生索引。
+- **Canonical Files != RAG Index**：本地知识文件是权威知识层，RAG 是可重建派生索引。
 - **AI Draft != Approved Knowledge**：AI 默认只能写 Review，关键事实需审核后进入 Canonical。
 - **Canonical-only Production RAG**：Production RAG 不直接索引 Raw、Legacy、Review 或临时语料。
 - **Legacy First, Raw Fallback**：已有高质量成果优先复用，只有缺失/损坏/低质量内容才回原始资料重新处理。
@@ -79,9 +70,11 @@ Langfuse 用于检索与回答质量观测、反馈和评估；KAG/OpenSPG 仅�
 
 ## 默认组件
 
+当前不部署 Wiki。Outline、BookStack、Wiki.js 等展示层均不属于当前主链；后续选型必须证明能原生读写本地知识文件，而非只导入/导出数据库副本。
+
 | 能力 | 默认组件 | 角色 |
 |---|---|---|
-| Human Wiki | BookStack | Review / Canonical Wiki / REST API |
+| File Knowledge Store | Local filesystem | Canonical Markdown/HTML/assets, provenance, directory governance |
 | Workflow | Prefect | Retry / Resume / Cache / Schedule / Concurrency |
 | 主解析 | Docling Serve | 异步文档解析 |
 | 复杂文档兜底 | MinerU | OCR / 复杂布局 / 表格 / 公式 |
@@ -98,10 +91,10 @@ xmg-kb 最终至少提供三类稳定能力：
 
 ```text
 Knowledge API
-- search/read canonical knowledge
+- search/read canonical files
 - source/provenance lookup
-- create/patch review
-- comment/history
+- submit feedback / knowledge proposal
+- controlled patch/history
 
 Retrieval API
 - search/retrieve/context
