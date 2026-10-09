@@ -4,7 +4,7 @@ xmg-kb 是一套面向企业技术资料的**知识库基础设施 / Knowledge P
 
 - 高质量知识入库管线；
 - 文档与知识治理；
-- 人类可读、可编辑的 Canonical Wiki；
+- 本地文件型 Canonical Knowledge Store；
 - 高质量 RAG 索引与检索；
 - 面向外部应用的 Knowledge API / Retrieval API；
 - 面向 AI Agent 的受控 MCP 接口；
