@@ -112,16 +112,16 @@ xmg-kb API
 xmg-kb MCP
 ```
 
-不要让业务应用直接依赖 BookStack DB、RAGFlow DB、Prefect DB 或内部容器网络。
+不要让业务应用直接依赖 Canonical 文件目录、RAGFlow DB、Prefect DB 或内部容器网络。
 
-BookStack / RAGFlow 官方 API 由 Adapter 层封装，便于未来替换和权限控制。
+Canonical 文件通过 FileStore/File API 访问；RAGFlow 通过 RagAdapter 访问。
 
 ## 6. 安全
 
 - 数据库不公网暴露；
 - Reverse Proxy 统一 TLS；
 - 不共享 Admin Token；
-- Wiki/API/MCP Token 使用最小权限；
+- API/MCP Token 使用最小权限；
 - Runtime Secret 通过 `.env`/secret store 注入；
 - `.env` 不进入 Git；
 - 默认关闭匿名写入；
