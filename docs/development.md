@@ -67,7 +67,7 @@ Prefect Flow 负责编排：
 - Parse；
 - Document Governance；
 - Knowledge Engineering；
-- Wiki Sync；
+- File Governance / Knowledge Proposal；
 - RAG Sync；
 - QA Regression；
 - Evolution；
