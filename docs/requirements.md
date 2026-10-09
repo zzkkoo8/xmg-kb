@@ -6,7 +6,7 @@ xmg-kb 是独立的知识库基础设施 / Knowledge Platform，只负责知识�
 
 1. **Ingestion**：知识入库、解析、标准化与可恢复处理；
 2. **Governance**：去重、元数据、版本、权威性、冲突、Knowledge Unit 与 Canonicalization；
-3. **Human Wiki**：人类可读、可编辑、可审核、可维护的 Canonical Wiki；
+3. **File Knowledge Store**：本地文件系统中的 Canonical Markdown/HTML/多媒体与元数据；
 4. **RAG**：Canonical-only 的高质量索引、检索、重排与引用；
 5. **API / MCP**：向外部应用和 AI Agent 提供稳定、受控的知识接口；
 6. **Operations**：状态、审计、质量评估、备份恢复与可观测性。
@@ -41,12 +41,12 @@ xmg-kb 不承担具体业务 Agent、聊天机器人、工单、钉钉、自动�
 
 AI 通过 API/MCP 必须能够：
 
-- Search Canonical；
-- Read Full Page；
+- Search Canonical Files；
+- Read File / Asset；
 - Read Source / Provenance；
-- Create Review；
-- Patch Review；
-- Comment；
+- Submit Feedback；
+- Create Knowledge Proposal；
+- Request controlled patch;
 - 提出分类、目录和合并建议。
 
 默认禁止：
@@ -55,7 +55,7 @@ AI 通过 API/MCP 必须能够：
 - 绕过 Review；
 - 无证据改变关键参数；
 - 静默解决版本或冲突；
-- 直接操作 Wiki 数据库。
+- 任意路径写入或直接绕过治理修改 Canonical 文件。
 
 ## 5. 海量入库管线
 
@@ -125,7 +125,7 @@ Production RAG 必须从通过质量门禁的 Canonical 文件构建；Raw、Leg
 - Context；
 - Metadata Filter；
 - Citation；
-- Canonical/Page/Revision Traceability。
+- File/Hash/Source Traceability。
 
 接口必须与具体外部业务 Agent 解耦。
 
