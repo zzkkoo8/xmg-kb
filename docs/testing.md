@@ -33,8 +33,8 @@ Source
 → Parse
 → Normalize
 → Governance
-→ Review
-→ Canonical
+→ Proposal
+→ Canonical Files
 → Chunk/Index
 → Retrieve
 ```
@@ -133,7 +133,7 @@ Hybrid + Rerank
 - Parser Crash；
 - Worker Restart；
 - Network Timeout；
-- Wiki Down；
+- File write failure / permission denial；
 - RAG Index Failure；
 - LLM Timeout；
 - Duplicate Event；
