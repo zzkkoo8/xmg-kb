@@ -114,7 +114,7 @@ Production RAG 必须从通过质量门禁的 Canonical 文件构建；Raw、Leg
 
 - Search / Read Canonical；
 - Source / Provenance Lookup；
-- History；
+- File change history / diff；
 - Create/Patch Review；
 - Comment。
 
