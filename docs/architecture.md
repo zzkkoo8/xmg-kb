@@ -206,11 +206,7 @@ OpenSPG/KAG 仅作为同数据集 POC；只有真实 Benchmark 明显改善 KU A
 
 ## 11. Production RAG：RAGFlow
 
-Production 只索引：
-
-```text
-BookStack Canonical
-```
+Production 只索引通过质量门禁的 Canonical 文件。
 
 禁止：
 
@@ -222,7 +218,7 @@ BookStack Canonical
 正式流程：
 
 ```text
-Canonical Page
+Canonical File
 → Parser
 → Chunker
 → optional Transformer
@@ -249,9 +245,10 @@ Chunk Size 不写死，由 Gold QA Benchmark 决定。
 每个 Production Chunk 至少继承：
 
 ```text
-wiki_page_id
-wiki_revision
-canonical_id
+knowledge_id
+relative_path
+content_sha256
+source_ids
 heading_path
 vendor
 product
@@ -262,7 +259,7 @@ authority
 content_sha256
 ```
 
-无法回溯 Canonical Page + Revision 的 Chunk 无效。
+无法回溯 Canonical File + content hash 的 Chunk 无效。
 
 ## 13. Incremental Sync
 
@@ -351,7 +348,7 @@ Langfuse 记录 Query、Retrieval Context、Canonical IDs、Answer、Citation、
 ```text
 SourceAdapter
 ParserAdapter
-WikiAdapter
+FileStore / File API
 RagAdapter
 ObservabilityAdapter
 ```
@@ -366,7 +363,6 @@ ObservabilityAdapter
 
 ```text
 deploy/
-  bookstack/
   prefect/
   docling-serve/
   mineru/
